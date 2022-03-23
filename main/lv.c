@@ -398,6 +398,7 @@ static void guiTask()
         vTaskDelay(pdMS_TO_TICKS(33));
         if (chooseScreen == 0)
         {
+            xQueueReceive(dataMouvement_Queue_Screen,&DM_Buff,portMAX_DELAY);
             lv_scr_load(scr1);
             gx = rand() % 10;
             gy = rand() % 10;

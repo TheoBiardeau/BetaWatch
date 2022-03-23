@@ -24,6 +24,7 @@ void IRAM_ATTR GPIO_iterupt(void *arg)
             {
                 chooseScreen = 0;
             }
+            xQueueSendFromISR(dataMouvement_Queue_Screen,&DM,pdFALSE);
             xSemaphoreGiveFromISR(xGuiSemaphore, pdFALSE);
         }
     }
@@ -43,6 +44,7 @@ void initGPIO()
 
 void app_main(void)
 {
+    initAll();
     initGPIO();
     launch(1);
     while (1)

@@ -10,6 +10,7 @@
 #include "esp_system.h"
 #include "driver/gpio.h"
 #include "lv_font/lv_font.h"
+#include "dataManagement.h"
 
 
 /* Littlevgl specific */
@@ -48,3 +49,4 @@ int gy;
 int gz;
 
 //BUFFER
+T_dataMouvement DM_Buff;
