@@ -1,5 +1,9 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+
 
 /*******************************
  *           const             *
@@ -13,39 +17,49 @@
  *******************************/
 typedef struct
 {
-    double Dacc_x[SIZE_MVT];
-    double Dacc_y[SIZE_MVT];
-    double Dacc_z[SIZE_MVT];
+    double Dacc_x;
+    double Dacc_y;
+    double Dacc_z;
 
-    double Dgyro_x[SIZE_MVT];
-    double Dgyro_y[SIZE_MVT];
-    double Dgyro_z[SIZE_MVT];
+    double Dgyro_x;
+    double Dgyro_y;
+    double Dgyro_z;
 
-    double Dmagn_x[SIZE_MVT];
-    double Dmagn_y[SIZE_MVT];
-    double Dmagn_z[SIZE_MVT];
-
-    uint16_t i;
+    double Dmagn_x;
+    double Dmagn_y;
+    double Dmagn_z;
 } T_dataMouvement;
 
 typedef struct
 {
-    double Dtemp[SIZE_TH];
-    double Dhumi[SIZE_TH];
-
-    uint16_t i;
+    double Dtemp;
+    double Dhumi;
 } T_dataTempHumi;
 
 typedef struct
 {
-    int32_t Dpressure[SIZE_PRESURE];
-
-    uint16_t i;
+    int32_t Dpressure;
 } T_dataPressur;
 
 T_dataMouvement DM;
 T_dataPressur DP;
 T_dataTempHumi DTH;
+
+/*******************************
+ *            Queue            *
+ *******************************/
+
+QueueHandle_t dataMouvement_Queue_Sd ; 
+QueueHandle_t dataMouvement_Queue_Ble ; 
+QueueHandle_t dataMouvement_Queue_Screen ;
+
+QueueHandle_t dataTempHumi_Queue_Sd ; 
+QueueHandle_t dataTempHumi_Queue_Ble ; 
+QueueHandle_t dataTempHumi_Queue_Screen ; 
+
+QueueHandle_t dataPressur_Queue_Sd ; 
+QueueHandle_t dataPressur_Queue_Ble ; 
+QueueHandle_t dataPressur_Queue_Screen ; 
 
 /*******************************
  *       Prototype fonction    *

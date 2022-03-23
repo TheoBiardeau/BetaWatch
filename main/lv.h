@@ -46,3 +46,5 @@ int az;
 int gx;
 int gy;
 int gz;
+
+//BUFFER

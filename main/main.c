@@ -1,17 +1,15 @@
 #include <stdio.h>
 #include "lv.h"
-#include "dataManagement.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "sdkconfig.h"
-
+#include "driver/timer.h"
 #define GPIO_BUTTON 0
 
-bool interupt_flag = 0;
 
-void IRAM_ATTR tim_iterupt(void *arg)
+void IRAM_ATTR GPIO_iterupt(void *arg)
 {
     if (((uint32_t)arg == GPIO_BUTTON) ? 1 : 0)
     {
@@ -32,14 +30,16 @@ void IRAM_ATTR tim_iterupt(void *arg)
    
 }
 
+
 void initGPIO()
 {
     gpio_reset_pin(GPIO_BUTTON);
     gpio_set_direction(GPIO_BUTTON, GPIO_MODE_INPUT);
     gpio_install_isr_service(GPIO_BUTTON);
     gpio_set_intr_type(GPIO_BUTTON, GPIO_INTR_POSEDGE);
-    gpio_isr_handler_add(GPIO_BUTTON, tim_iterupt, (void *)GPIO_BUTTON);
+    gpio_isr_handler_add(GPIO_BUTTON, GPIO_iterupt, (void *)GPIO_BUTTON);
 }
+
 
 void app_main(void)
 {
