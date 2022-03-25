@@ -1,6 +1,7 @@
+#include "timer_bw.h"
 #include "dataManagement.h"
 
-void initAll()
+void initQueuesSensors()
 {
     dataMouvement_Queue_Sd = xQueueCreate(SIZE_MVT, sizeof(DM));
     dataMouvement_Queue_Ble = xQueueCreate(1, sizeof(DM));
@@ -13,87 +14,117 @@ void initAll()
     dataPressur_Queue_Sd = xQueueCreate(SIZE_PRESURE, sizeof(DP));
     dataPressur_Queue_Ble = xQueueCreate(1, sizeof(DP));
     dataPressur_Queue_Screen = xQueueCreate(1, sizeof(DP));
-    printf("init Queue ok \n");
-}
 
-void clearAll()
-{
-    initAll();
+    I2CSema = xSemaphoreCreateMutex();
+    xSemaphoreGive(I2CSema);
+
+    xTaskCreate(setDataMouv, "setDataMouv", 10000, NULL, 4, NULL);
+    xTaskCreate(setDataPressur, "setDataPressur", 10000, NULL, 4, NULL);
+    xTaskCreate(setDataTempHumi, "setDataTempHumi", 10000, NULL, 4, NULL);
+    xTaskCreate(DataChoose, "DataChoose", 10000, NULL, 5, NULL);
+    printf("init data ok \n");
 }
 
 void saveAllData()
 {
-    // To be define
+    // To be define but currently this function reset the queues
+    xQueueReset(dataMouvement_Queue_Sd);
+    xQueueReset(dataTempHumi_Queue_Sd);
+    xQueueReset(dataPressur_Queue_Sd);
 }
 
-void setDataMouv(double wx, double wy, double wz, double ax, double ay, double az, double mx, double my, double mz)
+void setDataMouv()
 {
-
-    DM.Dacc_x = ax;
-    DM.Dacc_y = ay;
-    DM.Dacc_z = az;
-
-    DM.Dgyro_x = wx;
-    DM.Dgyro_y = wy;
-    DM.Dgyro_z = wz;
-
-    DM.Dmagn_x = mx;
-    DM.Dmagn_y = my;
-    DM.Dmagn_z = mz;
-
-    if (xQueueSend(dataMouvement_Queue_Sd,(void *)&DM,NULL) != pdPASS)
+    if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
-        /* Failed to post the message, even after 10 ticks. */
-    }
+        // DM = getDataMouvement
 
-    if (xQueueSend(dataMouvement_Queue_Ble,(void *)&DM,NULL) != pdPASS)
-    {
-        /* Failed to post the message, even after 10 ticks. */
-    }
+        if (xQueueSend(dataMouvement_Queue_Sd, (void *)&DM, NULL) != pdPASS)
+        {
+            /* Failed to post the message, even after 10 ticks. */
+        }
 
-    if (xQueueSend(dataMouvement_Queue_Screen,(void *)&DM,NULL) != pdPASS)
-    {
-        /* Failed to post the message, even after 10 ticks. */
+        if (xQueueSend(dataMouvement_Queue_Ble, (void *)&DM, NULL) != pdPASS)
+        {
+            /* Failed to post the message, even after 10 ticks. */
+        }
+
+        if (xQueueSend(dataMouvement_Queue_Screen, (void *)&DM, NULL) != pdPASS)
+        {
+            printf("doesnt \n");
+        }
+        xSemaphoreGive(I2CSema);
     }
+    vTaskDelete(NULL);
 }
 
-void setDataTempHumi(double temp, double humi)
+void setDataTempHumi()
 {
-    DTH.Dtemp = temp;
-    DTH.Dhumi = humi;
 
-    if (xQueueSend(dataTempHumi_Queue_Sd,(void *)&DTH,NULL) != pdPASS)
+    if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
-        /* Failed to post the message, even after 10 ticks. */
-    }
+        // DTH = getData
 
-    if (xQueueSend(dataTempHumi_Queue_Ble,(void *)&DTH,NULL) != pdPASS)
-    {
-        /* Failed to post the message, even after 10 ticks. */
-    }
+        if (xQueueSend(dataTempHumi_Queue_Sd, (void *)&DTH, NULL) != pdPASS)
+        {
+            /* Failed to post the message, even after 10 ticks. */
+        }
 
-    if (xQueueSend(dataTempHumi_Queue_Screen,(void *)&DTH,NULL) != pdPASS)
-    {
-        /* Failed to post the message, even after 10 ticks. */
+        if (xQueueSend(dataTempHumi_Queue_Ble, (void *)&DTH, NULL) != pdPASS)
+        {
+            /* Failed to post the message, even after 10 ticks. */
+        }
+
+        if (xQueueSend(dataTempHumi_Queue_Screen, (void *)&DTH, NULL) != pdPASS)
+        {
+            /* Failed to post the message, even after 10 ticks. */
+        }
+        xSemaphoreGive(I2CSema);
     }
+    vTaskDelete(NULL);
 }
 
-
-void setDataPressur(double pressur)
+void setDataPressur()
 {
-    DP.Dpressure = pressur;
-    if (xQueueSend(dataPressur_Queue_Sd,(void *)&DTH,NULL) != pdPASS)
+    if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
-        /* Failed to post the message, even after 10 ticks. */
-    }
 
-    if (xQueueSend(dataPressur_Queue_Ble,(void *)&DTH,NULL) != pdPASS)
-    {
-        /* Failed to post the message, even after 10 ticks. */
-    }
+        // DP = getDataPressur;
+        if (xQueueSend(dataPressur_Queue_Sd, (void *)&DTH, NULL) != pdPASS)
+        {
+            
+        }
 
-    if (xQueueSend(dataPressur_Queue_Screen,(void *)&DTH,NULL) != pdPASS)
+        if (xQueueSend(dataPressur_Queue_Ble, (void *)&DTH, NULL) != pdPASS)
+        {
+            /* Failed to post the message, even after 10 ticks. */
+        }
+
+        if (xQueueSend(dataPressur_Queue_Screen, (void *)&DTH, NULL) != pdPASS)
+        {
+            /* Failed to post the message, even after 10 ticks. */
+        }
+    }
+    xSemaphoreGive(I2CSema);
+    vTaskDelete(NULL);
+}
+
+void DataChoose()
+{
+    while (1)
     {
-        /* Failed to post the message, even after 10 ticks. */
+        xQueueReceive(s_timer_queue, &nb_occ_timer, portMAX_DELAY);
+
+        xTaskCreate(setDataMouv, "setDataMouv", 10000, NULL, 4, NULL);
+
+        if (nb_occ_timer % 10 == 0)
+        {
+            xTaskCreate(setDataPressur, "setDataPressur", 10000, NULL, 4, NULL);
+        }
+        if (nb_occ_timer % 100 == 0)
+        {
+
+            xTaskCreate(setDataTempHumi, "setDataTempHumi", 10000, NULL, 4, NULL);
+        }
     }
 }

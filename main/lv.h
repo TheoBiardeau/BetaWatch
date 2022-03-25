@@ -2,16 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_freertos_hooks.h"
 #include "freertos/semphr.h"
 #include "esp_system.h"
-#include "driver/gpio.h"
 #include "lv_font/lv_font.h"
 #include "dataManagement.h"
-
+#include "Gpio_bw.h"
 
 /* Littlevgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -27,7 +25,6 @@
 #define TAG "Gauge"
 #define LV_TICK_PERIOD_MS 1
 #define RAND_MAX 5
-int chooseScreen;
 SemaphoreHandle_t xGuiSemaphore;
 
 /**********************
@@ -49,4 +46,6 @@ int gy;
 int gz;
 
 //BUFFER
-T_dataMouvement DM_Buff;
+static T_dataMouvement DM_Buff;
+static T_dataPressur DP_Buff;
+static T_dataTempHumi DTH_Buff;

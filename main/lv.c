@@ -334,7 +334,6 @@ static void guiTask()
     lv_obj_t *compas = lv_gauge_create(scr5, NULL);
     lv_obj_t *legend_compas = lv_obj_create(scr5, NULL);
     lv_obj_t *L_legend_compas = lv_label_create(scr5, NULL);
-
     lv_obj_set_size(compas, 200, 200);
     lv_obj_align(compas, NULL, LV_ALIGN_CENTER, 0, 0);
     lv_gauge_set_range(compas, 0, 360);
@@ -383,22 +382,17 @@ static void guiTask()
     static lv_style_t style_Police;
     lv_style_init(&style_Police);
     lv_obj_t *Clock = lv_label_create(scr7, NULL);
-    lv_style_set_text_font(&style_Police, LV_STATE_DEFAULT, LV_FONT_MONTSERRAT_18);
-    lv_style_set_bg_color(&style_Police, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lv_obj_add_style(Clock, LV_OBJ_PART_MAIN, &style_Police);
-
-    
-    lv_obj_set_size(Clock, 100, 100);
-    lv_obj_align(Clock, NULL, LV_ALIGN_CENTER, 0, 0);
-    lv_label_set_text_fmt(Clock,"%d h %d m %d s",10,20,59);
+    lv_obj_align(Clock,NULL, LV_ALIGN_CENTER, -10,0);
+    lv_label_set_text_fmt(Clock, "%d h %d m %d s", 10, 20, 59);
 
     while (1)
     {
+        
         lv_task_handler();
-        vTaskDelay(pdMS_TO_TICKS(33));
         if (chooseScreen == 0)
-        {
-            xQueueReceive(dataMouvement_Queue_Screen,&DM_Buff,portMAX_DELAY);
+        {   
+
+            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_scr_load(scr1);
             gx = rand() % 10;
             gy = rand() % 10;
@@ -411,7 +405,8 @@ static void guiTask()
             lv_label_set_text_fmt(Value_wz, "%d", gz);
         }
         else if (chooseScreen == 1)
-        {
+        {   
+            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_scr_load(scr2);
             lv_chart_refresh(chart_gyro);
             lv_chart_set_next(chart_gyro, ser1_gyro, rand() % 10 + 80);
@@ -419,7 +414,9 @@ static void guiTask()
             lv_chart_set_next(chart_gyro, ser3_gyro, rand() % 10 + 20);
         }
         else if (chooseScreen == 2)
-        {
+        {   
+
+            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_scr_load(scr3);
             ax = rand() % 10;
             ay = rand() % 10;
@@ -432,7 +429,9 @@ static void guiTask()
             lv_label_set_text_fmt(Value_az, "%d", az);
         }
         else if (chooseScreen == 3)
-        {
+        {   
+
+            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_scr_load(scr4);
             lv_chart_refresh(chart_acc);
             lv_chart_set_next(chart_acc, ser1_acc, rand() % 10 + 80);
@@ -441,6 +440,7 @@ static void guiTask()
         }
         else if (chooseScreen == 4)
         {
+            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_scr_load(scr5);
             data_test = rand() % 360;
             lv_gauge_set_value(compas, 0, data_test);
@@ -449,11 +449,14 @@ static void guiTask()
         }
         else if (chooseScreen == 5)
         {
+            xQueueReceive(dataTempHumi_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_scr_load(scr6);
+            lv_task_handler();
         }
         else if (chooseScreen == 6)
         {
             lv_scr_load(scr7);
+            lv_task_handler();
         }
     }
 }

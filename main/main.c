@@ -2,54 +2,24 @@
 #include "lv.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "driver/gpio.h"
 #include "esp_log.h"
 #include "sdkconfig.h"
-#include "driver/timer.h"
-#define GPIO_BUTTON 0
-
-
-void IRAM_ATTR GPIO_iterupt(void *arg)
-{
-    if (((uint32_t)arg == GPIO_BUTTON) ? 1 : 0)
-    {
-        if (xSemaphoreTakeFromISR(xGuiSemaphore, pdFALSE) == pdTRUE)
-        {
-
-            if( chooseScreen < 6 &&  chooseScreen >= 0)
-            {
-                chooseScreen ++;
-            }
-            else
-            {
-                chooseScreen = 0;
-            }
-            xQueueSendFromISR(dataMouvement_Queue_Screen,&DM,pdFALSE);
-            xSemaphoreGiveFromISR(xGuiSemaphore, pdFALSE);
-        }
-    }
-   
-}
-
-
-void initGPIO()
-{
-    gpio_reset_pin(GPIO_BUTTON);
-    gpio_set_direction(GPIO_BUTTON, GPIO_MODE_INPUT);
-    gpio_install_isr_service(GPIO_BUTTON);
-    gpio_set_intr_type(GPIO_BUTTON, GPIO_INTR_POSEDGE);
-    gpio_isr_handler_add(GPIO_BUTTON, GPIO_iterupt, (void *)GPIO_BUTTON);
-}
-
+#include "timer_bw.h"
+#include "Gpio_bw.h"
 
 void app_main(void)
 {
-    initAll();
+
+    timer_initAll(TIMER_GROUP_0, TIMER_0, true, 0.1);
+    initQueuesSensors();
     initGPIO();
     launch(1);
+    uint32_t test = 0;
     while (1)
     {
-        vTaskDelay(pdMS_TO_TICKS(100)); /* code */
-        printf("%d \n",chooseScreen);
+        xQueueReceive(s_timer_queue, &test, portMAX_DELAY);
+        printf("Number of alarm %d \n", test);
+        printf("%d \n", chooseScreen);
+
     }
 }

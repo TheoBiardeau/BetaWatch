@@ -3,7 +3,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
-
+#include "freertos/semphr.h"
 
 /*******************************
  *           const             *
@@ -41,10 +41,9 @@ typedef struct
     int32_t Dpressure;
 } T_dataPressur;
 
-T_dataMouvement DM;
-T_dataPressur DP;
-T_dataTempHumi DTH;
-
+static T_dataMouvement DM;
+static T_dataPressur DP;
+static T_dataTempHumi DTH;
 /*******************************
  *            Queue            *
  *******************************/
@@ -65,12 +64,22 @@ QueueHandle_t dataPressur_Queue_Screen ;
  *       Prototype fonction    *
  *******************************/
 
-void initAll();
+void initQueuesSensors();
 
-void clearAll();
-
-void setDataMouv(double wx,double wy,double wz,double ax,double ay,double az,double mx,double my,double mz);
-void setDataTempHumi(double temp, double humi);
-void setDataPressur(double pressur);
+void setDataMouv();
+void setDataTempHumi();
+void setDataPressur();
 
 void saveAllData();
+
+void DataChoose();
+/*******************************
+ *       Private Variable   *
+ *******************************/
+
+static uint32_t nb_occ_timer;
+
+/*******************************
+ *       Semaphores   *
+ *******************************/
+xSemaphoreHandle I2CSema;
