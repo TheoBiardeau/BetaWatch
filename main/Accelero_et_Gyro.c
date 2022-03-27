@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "esp_log.h"
-#include "./LSM6DSO/lsm6dso_reg.h"
+#include "lsm6dso_reg.h"
 #include "driver/i2c.h"
 
 #include "Accelero_et_Gyro.h"
@@ -12,8 +12,8 @@
 #include "esp_bt_main.h"
 #include "esp_gatt_common_api.h"
 
-#include "./BLE/ble_init.h"
-#include "./BLE/gatt_server_profile.h"
+//#include "./BLE/ble_init.h"
+//#include "./BLE/gatt_server_profile.h"
 
 #include "sdkconfig.h"
 
@@ -33,28 +33,28 @@ static const char *TAG = "esp32_lsm6do";
 
 #define LSM6DO_ADDR_7BITS 0x6b
 #define SENSOR_BUS I2C_MASTER_NUM
-#define WRITE_BIT I2C_MASTER_WRITE              /*!< I2C master write */
-#define READ_BIT I2C_MASTER_READ                /*!< I2C master read */
-#define ACK_CHECK_EN 0x1                        /*!< I2C master will check ack from slave*/
-#define ACK_CHECK_DIS 0x0                       /*!< I2C master will not check ack from slave */
-#define ACK_VAL 0x0                             /*!< I2C ack value */
-#define NACK_VAL 0x1                            /*!< I2C nack value */
+#define WRITE_BIT I2C_MASTER_WRITE /*!< I2C master write */
+#define READ_BIT I2C_MASTER_READ   /*!< I2C master read */
+#define ACK_CHECK_EN 0x1           /*!< I2C master will check ack from slave*/
+#define ACK_CHECK_DIS 0x0          /*!< I2C master will not check ack from slave */
+#define ACK_VAL 0x0                /*!< I2C ack value */
+#define NACK_VAL 0x1               /*!< I2C nack value */
 
-typedef union {
+typedef union
+{
     int16_t i16bit[3];
     uint8_t u8bit[6];
 } axis3bit16_t;
 
 static uint8_t whoamI, rst;
 stmdev_ctx_t lsm6dsoDriver;
-//static float angular_rate_mdps_LSM6DSOX[3];
-//static float acceleration_mg_LSM6DSOX[3];
-static axis3bit16_t data_raw_acceleration_LSM6DSOX; 
-static axis3bit16_t data_raw_angular_rate_LSM6DSOX; 
+// static float angular_rate_mdps_LSM6DSOX[3];
+// static float acceleration_mg_LSM6DSOX[3];
+static axis3bit16_t data_raw_acceleration_LSM6DSOX;
+static axis3bit16_t data_raw_angular_rate_LSM6DSOX;
 TaskHandle_t xHandle_lsm6dso = NULL;
 uint8_t reg_LSM6DSOX;
-
-
+bool loopcond = 1;
 /**
  * @brief test code to read esp-i2c-slave like a memory device
  *        We need to fill the buffer of esp slave device, then master can read them out.
@@ -66,7 +66,8 @@ uint8_t reg_LSM6DSOX;
  */
 static int32_t i2c_master_read_slave(uint8_t i2c_num, uint8_t regaddr, uint8_t *data_rd, uint16_t size)
 {
-    if (size == 0) {
+    if (size == 0)
+    {
         return ESP_OK;
     }
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -76,7 +77,8 @@ static int32_t i2c_master_read_slave(uint8_t i2c_num, uint8_t regaddr, uint8_t *
 
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, (LSM6DO_ADDR_7BITS << 1) | I2C_MASTER_READ, ACK_CHECK_EN);
-    if (size > 1) {
+    if (size > 1)
+    {
         i2c_master_read(cmd, data_rd, size - 1, ACK_VAL);
     }
     i2c_master_read_byte(cmd, data_rd + size - 1, NACK_VAL);
@@ -127,58 +129,26 @@ static esp_err_t i2c_master_init(void)
     return i2c_driver_install(i2c_master_port, conf.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
 }
 
-static void get_accelerometre_and_gyroscope() {
-    
-    while(1) {
-        
-        lsm6dso_xl_flag_data_ready_get(&lsm6dsoDriver, &reg_LSM6DSOX);
-        
-        if (reg_LSM6DSOX) {
-            memset(data_raw_acceleration_LSM6DSOX.u8bit, 0x00, 3 * sizeof(int16_t));
-            lsm6dso_acceleration_raw_get(&lsm6dsoDriver, data_raw_acceleration_LSM6DSOX.u8bit);
-            acceleration_mg_LSM6DSOX[0] = lsm6dso_from_fs2_to_mg(data_raw_acceleration_LSM6DSOX.i16bit[0]);
-            acceleration_mg_LSM6DSOX[1] = lsm6dso_from_fs2_to_mg(data_raw_acceleration_LSM6DSOX.i16bit[1]);
-            acceleration_mg_LSM6DSOX[2] = lsm6dso_from_fs2_to_mg(data_raw_acceleration_LSM6DSOX.i16bit[2]);
-        }
-    
-        lsm6dso_gy_flag_data_ready_get(&lsm6dsoDriver, &reg_LSM6DSOX);
-        
-        if (reg_LSM6DSOX) {
-            memset(data_raw_angular_rate_LSM6DSOX.u8bit, 0x00, 3 * sizeof(int16_t));
-            lsm6dso_angular_rate_raw_get(&lsm6dsoDriver, data_raw_angular_rate_LSM6DSOX.u8bit);
-            angular_rate_mdps_LSM6DSOX[0] = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[0]);
-            angular_rate_mdps_LSM6DSOX[1] = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[1]);
-            angular_rate_mdps_LSM6DSOX[2] = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[2]);
-        }
-
-        printf("Nouvelle mesure :\n");
-        printf("acceleration[0] : %f\n", acceleration_mg_LSM6DSOX[0]/1000); 
-        printf("acceleration[1] : %f\n", acceleration_mg_LSM6DSOX[1]/1000); 
-        printf("acceleration[2] : %f\n", acceleration_mg_LSM6DSOX[2]/1000); 
-        printf("\n");
-        printf("angular_rate[0] : %f\n", angular_rate_mdps_LSM6DSOX[0]/1000); 
-        printf("angular_rate[1] : %f\n", angular_rate_mdps_LSM6DSOX[1]/1000); 
-        printf("angular_rate[2] : %f\n", angular_rate_mdps_LSM6DSOX[2]/1000); 
-        printf("\n");
-
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
+T_dataMouvement get_LSM6DSO()
+{
+    while (loopcond)
+    {
+        lsm6dsoDriver.write_reg = i2c_master_write_slave;
+        lsm6dsoDriver.read_reg = i2c_master_read_slave;
+        lsm6dsoDriver.handle = SENSOR_BUS;
+        loopcond = 0;
     }
-}
-
-static void Init_LSM6DSO(void) {
-    
-    lsm6dsoDriver.write_reg = i2c_master_write_slave;
-    lsm6dsoDriver.read_reg = i2c_master_read_slave;
-    lsm6dsoDriver.handle = SENSOR_BUS;
 
     /* Check device ID for LSM6DSOX accelerometer */
     whoamI = 0;
     lsm6dso_device_id_get(&lsm6dsoDriver, &whoamI);
     /* Configure LSM6DSOX accelerometer */
-    if (whoamI == LSM6DSO_ID) {
+    if (whoamI == LSM6DSO_ID)
+    {
         /* Restore default configuration */
         lsm6dso_reset_set(&lsm6dsoDriver, PROPERTY_ENABLE);
-        do {
+        do
+        {
             lsm6dso_reset_get(&lsm6dsoDriver, &rst);
         } while (rst);
         /* Disable I3C interface */
@@ -196,34 +166,32 @@ static void Init_LSM6DSO(void) {
         lsm6dso_xl_filter_lp2_set(&lsm6dsoDriver, PROPERTY_ENABLE);
 
         ESP_LOGI(TAG, "OK whoami : LSM6DSO");
-        
-        xTaskCreate(get_accelerometre_and_gyroscope, "get_accelerometre_and_gyroscope", 1024*2, (void *)0, 5, NULL);
-        vTaskDelete(xHandle_lsm6dso);
+        lsm6dso_xl_flag_data_ready_get(&lsm6dsoDriver, &reg_LSM6DSOX);
 
-    } else {
+        if (reg_LSM6DSOX)
+        {
+            memset(data_raw_acceleration_LSM6DSOX.u8bit, 0x00, 3 * sizeof(int16_t));
+            lsm6dso_acceleration_raw_get(&lsm6dsoDriver, data_raw_acceleration_LSM6DSOX.u8bit);
+            DMT.Dacc_x = lsm6dso_from_fs2_to_mg(data_raw_acceleration_LSM6DSOX.i16bit[0])/1000;
+            DMT.Dacc_y = lsm6dso_from_fs2_to_mg(data_raw_acceleration_LSM6DSOX.i16bit[1])/1000;
+            DMT.Dacc_z = lsm6dso_from_fs2_to_mg(data_raw_acceleration_LSM6DSOX.i16bit[2])/1000;
+        }
+
+        lsm6dso_gy_flag_data_ready_get(&lsm6dsoDriver, &reg_LSM6DSOX);
+
+        if (reg_LSM6DSOX)
+        {
+            memset(data_raw_angular_rate_LSM6DSOX.u8bit, 0x00, 3 * sizeof(int16_t));
+            lsm6dso_angular_rate_raw_get(&lsm6dsoDriver, data_raw_angular_rate_LSM6DSOX.u8bit);
+            DMT.Dgyro_x = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[0])/1000000;
+            DMT.Dgyro_y = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[1])/1000000;
+            DMT.Dgyro_z = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[2])/1000000;
+        }
+    }
+    else
+    {
 
         ESP_LOGE(TAG, "ERROR whoami : LSM6DSO");
-        vTaskDelete(NULL);
     }
-}
-
-void app_main(void){
-    
-    i2c_master_init();
-    Init_LSM6DSO();
-    
-    //ble_init();
-
-    /*
-	for (uint8_t i=0; i<5;i++)
-		prof_shared_buf[i] = temp_tab[i];
-    */
-
-	//esp_ble_gatts_register_callback(gatts_event_handler);
-
-	//esp_ble_gap_register_callback(gap_event_handler);
-
-	//esp_ble_gatts_app_register(PROFILE_APP_ID);
-
-    //TaskCreatePinnedToCore(Init_LSM6DSO, "init_LSM6DSO", 1024*2, (void *)0, 10, &xHandle_lsm6dso, 1);
+    return DMT;
 }

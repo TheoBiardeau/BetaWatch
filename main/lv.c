@@ -196,6 +196,7 @@ static void guiTask()
     lv_obj_add_style(wz, LV_OBJ_PART_MAIN, &style_Blue);
 
     chart_gyro = lv_chart_create(scr2, NULL);
+    lv_chart_set_range(chart_gyro, 0, 10);
     lv_obj_set_size(chart_gyro, 290, 180);
     lv_chart_set_point_count(chart_gyro, 30);
     lv_obj_align(chart_gyro, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, -20);
@@ -301,6 +302,7 @@ static void guiTask()
     lv_obj_add_style(Az_c, LV_OBJ_PART_MAIN, &style_Blue);
 
     chart_acc = lv_chart_create(scr4, NULL);
+    lv_chart_set_range(chart_acc, 0, 10);
     lv_obj_set_size(chart_acc, 290, 180);
     lv_chart_set_point_count(chart_acc, 30);
     lv_obj_align(chart_acc, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, -20);
@@ -411,9 +413,9 @@ static void guiTask()
             lv_bar_set_value(b_wx, DM_Buff.Dgyro_x, NULL);
             lv_bar_set_value(b_wy, DM_Buff.Dgyro_y, NULL);
             lv_bar_set_value(b_wz, DM_Buff.Dgyro_z, NULL);
-            lv_label_set_text_fmt(Value_wx, "%d", DM_Buff.Dgyro_x);
-            lv_label_set_text_fmt(Value_wy, "%d", DM_Buff.Dgyro_x);
-            lv_label_set_text_fmt(Value_wz, "%d", DM_Buff.Dgyro_x);
+            lv_label_set_text_fmt(Value_wx, "%.2f", DM_Buff.Dgyro_x);
+            lv_label_set_text_fmt(Value_wy, "%.2f", DM_Buff.Dgyro_x);
+            lv_label_set_text_fmt(Value_wz, "%.2f", DM_Buff.Dgyro_x);
         }
         else if (chooseScreen == 1)
         {
@@ -432,9 +434,9 @@ static void guiTask()
             lv_bar_set_value(b_ax, DM_Buff.Dacc_x, NULL);
             lv_bar_set_value(b_ay, DM_Buff.Dacc_y, NULL);
             lv_bar_set_value(b_az, DM_Buff.Dacc_z, NULL);
-            lv_label_set_text_fmt(Value_ax, "%d", DM_Buff.Dacc_x);
-            lv_label_set_text_fmt(Value_ay, "%d", DM_Buff.Dacc_y);
-            lv_label_set_text_fmt(Value_az, "%d", DM_Buff.Dacc_z);
+            lv_label_set_text_fmt(Value_ax, "%.2f", DM_Buff.Dacc_x);
+            lv_label_set_text_fmt(Value_ay, "%.2f", DM_Buff.Dacc_y);
+            lv_label_set_text_fmt(Value_az, "%.2f", DM_Buff.Dacc_z);
         }
 
         else if (chooseScreen == 3)
@@ -442,9 +444,9 @@ static void guiTask()
             lv_scr_load(scr4);
             xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_chart_refresh(chart_acc);
-            lv_chart_set_next(chart_acc, ser1_acc, DM_Buff.Dacc_x);
-            lv_chart_set_next(chart_acc, ser2_acc, DM_Buff.Dacc_y);
-            lv_chart_set_next(chart_acc, ser3_acc, DM_Buff.Dacc_z);
+            lv_chart_set_next(chart_acc, ser1_acc, DM_Buff.Dacc_x + 5);
+            lv_chart_set_next(chart_acc, ser2_acc, DM_Buff.Dacc_y + 5);
+            lv_chart_set_next(chart_acc, ser3_acc, DM_Buff.Dacc_z + 5);
         }
         else if (chooseScreen == 4)
         {

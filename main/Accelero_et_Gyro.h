@@ -1,7 +1,10 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
-float angular_rate_mdps_LSM6DSOX[3];
-float acceleration_mg_LSM6DSOX[3];
+#include "dataManagement.h"
+
+T_dataMouvement get_LSM6DSO();
+
+T_dataMouvement DMT;
 
 #endif /* MAIN_H_ */

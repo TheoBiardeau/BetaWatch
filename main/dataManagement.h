@@ -1,3 +1,6 @@
+#ifndef DATAMANAGEMENT
+#define DATAMANAGEMENT
+
 #include <stdbool.h>
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
@@ -16,18 +19,23 @@
  *******************************/
 typedef struct
 {
-    double Dacc_x;
-    double Dacc_y;
-    double Dacc_z;
+    float Dacc_x;
+    float Dacc_y;
+    float Dacc_z;
 
-    double Dgyro_x;
-    double Dgyro_y;
-    double Dgyro_z;
+    float Dgyro_x;
+    float Dgyro_y;
+    float Dgyro_z;
 
+} T_dataMouvement;
+
+typedef struct
+{
     double Dmagn_x;
     double Dmagn_y;
     double Dmagn_z;
-} T_dataMouvement;
+
+} T_dataMagnetique;
 
 typedef struct
 {
@@ -48,6 +56,7 @@ typedef struct
 static T_dataMouvement DM;
 static T_dataPressur DP;
 static T_dataTempHumi DTH;
+static T_dataMagnetique DMA;
 /*******************************
  *            Queue            *
  *******************************/
@@ -55,6 +64,10 @@ static T_dataTempHumi DTH;
 QueueHandle_t dataMouvement_Queue_Sd ; 
 QueueHandle_t dataMouvement_Queue_Ble ; 
 QueueHandle_t dataMouvement_Queue_Screen ;
+
+QueueHandle_t dataMagn_Queue_Sd ; 
+QueueHandle_t dataMagn_Queue_Ble ; 
+QueueHandle_t dataMagn_Queue_Screen ;
 
 QueueHandle_t dataTempHumi_Queue_Sd ; 
 QueueHandle_t dataTempHumi_Queue_Ble ; 
@@ -87,3 +100,5 @@ static uint32_t nb_occ_timer;
  *       Semaphores   *
  *******************************/
 xSemaphoreHandle I2CSema;
+
+#endif
