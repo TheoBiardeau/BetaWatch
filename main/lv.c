@@ -19,7 +19,7 @@ void launch()
     /* If you want to use a task to create the graphic, you NEED to create a Pinned task
      * Otherwise there can be problem such as memory corruption and so on.
      * NOTE: When not using Wi-Fi nor Bluetooth you can pin the guiTask to core 0 */
-    xTaskCreatePinnedToCore(guiTask, "gui", 4096 * 2, NULL, 0, NULL, 1);
+    xTaskCreatePinnedToCore(guiTask, "gui", 4096 * 6, NULL, 0, NULL, 1);
 }
 
 /* Creates a semaphore to handle concurrent call to lvgl stuff
@@ -28,7 +28,6 @@ void launch()
 
 static void guiTask()
 {
-    xGuiSemaphore = xSemaphoreCreateMutex();
 
     lv_init();
 
@@ -91,6 +90,7 @@ static void guiTask()
     esp_timer_handle_t periodic_timer;
     ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_args, &periodic_timer));
     ESP_ERROR_CHECK(esp_timer_start_periodic(periodic_timer, LV_TICK_PERIOD_MS * 1000));
+    xSemaphoreGive(I2CSema);
 
     /* Create the demo application */
 
@@ -104,6 +104,7 @@ static void guiTask()
     lv_obj_t *scr5 = lv_obj_create(NULL, NULL);
     lv_obj_t *scr6 = lv_obj_create(NULL, NULL);
     lv_obj_t *scr7 = lv_obj_create(NULL, NULL);
+    lv_obj_t *scr8 = lv_obj_create(NULL, NULL);
 
     static lv_style_t style_Screen;
     lv_style_init(&style_Screen);
@@ -378,84 +379,91 @@ static void guiTask()
 
     /**********************************
      *  set object for screen 7 *
+     **********************************/
+
+    lv_obj_t *pressure_gauge = lv_gauge_create(scr7, NULL);
+    lv_obj_t *L_legend_pressure = lv_label_create(scr7, NULL);
+    lv_obj_set_size(pressure_gauge, 200, 200);
+    lv_obj_align(pressure_gauge, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_gauge_set_range(pressure_gauge, 990, 1020);
+    lv_gauge_set_critical_value(pressure_gauge, 1021);
+    lv_gauge_set_scale(pressure_gauge, 270, 25, 5);
+
+    lv_obj_align(L_legend_pressure, NULL, LV_ALIGN_IN_TOP_MID, -22, 0);
+    lv_label_set_text_fmt(L_legend_pressure, "pressure");
+
+    /**********************************
+     *  set object for screen 8 *
      *********************************/
     static lv_style_t style_Police;
     lv_style_init(&style_Police);
-    lv_obj_t *Clock = lv_label_create(scr7, NULL);
-    lv_obj_align(Clock,NULL, LV_ALIGN_CENTER, -10,0);
+    lv_obj_t *Clock = lv_label_create(scr8, NULL);
+    lv_obj_align(Clock, NULL, LV_ALIGN_CENTER, -10, 0);
     lv_label_set_text_fmt(Clock, "%d h %d m %d s", 10, 20, 59);
-
     while (1)
     {
-        
         lv_task_handler();
-        if (chooseScreen == 0)
-        {   
 
-            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
+        if (chooseScreen == 0)
+        {
             lv_scr_load(scr1);
-            gx = rand() % 10;
-            gy = rand() % 10;
-            gz = rand() % 10;
-            lv_bar_set_value(b_wx, gx, NULL);
-            lv_bar_set_value(b_wy, gy, NULL);
-            lv_bar_set_value(b_wz, gz, NULL);
-            lv_label_set_text_fmt(Value_wx, "%d", gx);
-            lv_label_set_text_fmt(Value_wy, "%d", gy);
-            lv_label_set_text_fmt(Value_wz, "%d", gz);
+            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
+            lv_bar_set_value(b_wx, DM_Buff.Dgyro_x, NULL);
+            lv_bar_set_value(b_wy, DM_Buff.Dgyro_y, NULL);
+            lv_bar_set_value(b_wz, DM_Buff.Dgyro_z, NULL);
+            lv_label_set_text_fmt(Value_wx, "%d", DM_Buff.Dgyro_x);
+            lv_label_set_text_fmt(Value_wy, "%d", DM_Buff.Dgyro_x);
+            lv_label_set_text_fmt(Value_wz, "%d", DM_Buff.Dgyro_x);
         }
         else if (chooseScreen == 1)
-        {   
-            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
+        {
+
             lv_scr_load(scr2);
+            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_chart_refresh(chart_gyro);
-            lv_chart_set_next(chart_gyro, ser1_gyro, rand() % 10 + 80);
-            lv_chart_set_next(chart_gyro, ser2_gyro, rand() % 10 + 50);
-            lv_chart_set_next(chart_gyro, ser3_gyro, rand() % 10 + 20);
+            lv_chart_set_next(chart_gyro, ser1_gyro, DM_Buff.Dgyro_x);
+            lv_chart_set_next(chart_gyro, ser2_gyro, DM_Buff.Dgyro_y);
+            lv_chart_set_next(chart_gyro, ser3_gyro, DM_Buff.Dgyro_z);
         }
         else if (chooseScreen == 2)
-        {   
-
-            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
+        {
             lv_scr_load(scr3);
-            ax = rand() % 10;
-            ay = rand() % 10;
-            az = rand() % 10;
-            lv_bar_set_value(b_ax, ax, NULL);
-            lv_bar_set_value(b_ay, ay, NULL);
-            lv_bar_set_value(b_az, az, NULL);
-            lv_label_set_text_fmt(Value_ax, "%d", ax);
-            lv_label_set_text_fmt(Value_ay, "%d", ay);
-            lv_label_set_text_fmt(Value_az, "%d", az);
-        }
-        else if (chooseScreen == 3)
-        {   
-
             xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
+            lv_bar_set_value(b_ax, DM_Buff.Dacc_x, NULL);
+            lv_bar_set_value(b_ay, DM_Buff.Dacc_y, NULL);
+            lv_bar_set_value(b_az, DM_Buff.Dacc_z, NULL);
+            lv_label_set_text_fmt(Value_ax, "%d", DM_Buff.Dacc_x);
+            lv_label_set_text_fmt(Value_ay, "%d", DM_Buff.Dacc_y);
+            lv_label_set_text_fmt(Value_az, "%d", DM_Buff.Dacc_z);
+        }
+
+        else if (chooseScreen == 3)
+        {
             lv_scr_load(scr4);
+            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_chart_refresh(chart_acc);
-            lv_chart_set_next(chart_acc, ser1_acc, rand() % 10 + 80);
-            lv_chart_set_next(chart_acc, ser2_acc, rand() % 10 + 50);
-            lv_chart_set_next(chart_acc, ser3_acc, rand() % 10 + 20);
+            lv_chart_set_next(chart_acc, ser1_acc, DM_Buff.Dacc_x);
+            lv_chart_set_next(chart_acc, ser2_acc, DM_Buff.Dacc_y);
+            lv_chart_set_next(chart_acc, ser3_acc, DM_Buff.Dacc_z);
         }
         else if (chooseScreen == 4)
         {
-            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_scr_load(scr5);
-            data_test = rand() % 360;
-            lv_gauge_set_value(compas, 0, data_test);
-            lv_gauge_set_value(compas, 1, data_test);
-            lv_gauge_set_value(compas, 2, data_test);
+            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
+            lv_gauge_set_value(compas, 0, 0);
         }
         else if (chooseScreen == 5)
         {
-            xQueueReceive(dataTempHumi_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_scr_load(scr6);
-            lv_task_handler();
+            xQueueReceive(dataTempHumi_Queue_Screen, &DTH_Buff, portMAX_DELAY);
+            lv_gauge_set_value(humidity, 0, DTH_Buff.Dtemp);
+            lv_gauge_set_value(humidity, 0, DTH_Buff.Dhumi);
         }
         else if (chooseScreen == 6)
         {
             lv_scr_load(scr7);
+            xQueueReceive(dataPressur_Queue_Screen, &DP_Buff, portMAX_DELAY);
+            lv_gauge_set_value(pressure_gauge,0,(int)DP_Buff.Dpressure);
             lv_task_handler();
         }
     }

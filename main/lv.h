@@ -45,7 +45,9 @@ int gx;
 int gy;
 int gz;
 
-//BUFFER
+/**************************
+ *  Private buffer struct *
+ **************************/
 static T_dataMouvement DM_Buff;
 static T_dataPressur DP_Buff;
 static T_dataTempHumi DTH_Buff;

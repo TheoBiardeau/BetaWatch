@@ -4,7 +4,6 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
-
 /*******************************
  *           const             *
  *******************************/
@@ -13,7 +12,7 @@
 #define SIZE_PRESURE 60
 
 /*******************************
- *       Public struct         *
+ *       public struct         *
  *******************************/
 typedef struct
 {
@@ -38,8 +37,13 @@ typedef struct
 
 typedef struct
 {
-    int32_t Dpressure;
+    double Dpressure;
 } T_dataPressur;
+
+
+/*******************************
+ *       private struct         *
+ *******************************/
 
 static T_dataMouvement DM;
 static T_dataPressur DP;

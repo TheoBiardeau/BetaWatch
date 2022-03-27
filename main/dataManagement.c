@@ -1,8 +1,9 @@
 #include "timer_bw.h"
-#include "dataManagement.h"
+#include "LPS_user.h"
 
 void initQueuesSensors()
 {
+
     dataMouvement_Queue_Sd = xQueueCreate(SIZE_MVT, sizeof(DM));
     dataMouvement_Queue_Ble = xQueueCreate(1, sizeof(DM));
     dataMouvement_Queue_Screen = xQueueCreate(1, sizeof(DM));
@@ -18,10 +19,10 @@ void initQueuesSensors()
     I2CSema = xSemaphoreCreateMutex();
     xSemaphoreGive(I2CSema);
 
-    xTaskCreate(setDataMouv, "setDataMouv", 10000, NULL, 4, NULL);
-    xTaskCreate(setDataPressur, "setDataPressur", 10000, NULL, 4, NULL);
-    xTaskCreate(setDataTempHumi, "setDataTempHumi", 10000, NULL, 4, NULL);
-    xTaskCreate(DataChoose, "DataChoose", 10000, NULL, 5, NULL);
+    xTaskCreatePinnedToCore(setDataMouv, "setDataMouv", 10000, NULL, 4, NULL, 1);
+    xTaskCreatePinnedToCore(setDataPressur, "setDataPressur", 10000, NULL, 4, NULL, 1);
+    xTaskCreatePinnedToCore(setDataTempHumi, "setDataTempHumi", 10000, NULL, 4, NULL, 1);
+    xTaskCreatePinnedToCore(DataChoose, "DataChoose", 10000, NULL, 5, NULL, 0);
     printf("init data ok \n");
 }
 
@@ -37,7 +38,7 @@ void setDataMouv()
 {
     if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
-        // DM = getDataMouvement
+        // DM = GetPressur();
 
         if (xQueueSend(dataMouvement_Queue_Sd, (void *)&DM, NULL) != pdPASS)
         {
@@ -51,7 +52,6 @@ void setDataMouv()
 
         if (xQueueSend(dataMouvement_Queue_Screen, (void *)&DM, NULL) != pdPASS)
         {
-            printf("doesnt \n");
         }
         xSemaphoreGive(I2CSema);
     }
@@ -88,24 +88,21 @@ void setDataPressur()
 {
     if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
-
-        // DP = getDataPressur;
-        if (xQueueSend(dataPressur_Queue_Sd, (void *)&DTH, NULL) != pdPASS)
+        DP = getPressure();
+        if (xQueueSend(dataPressur_Queue_Sd, (void *)&DP, NULL) != pdPASS)
         {
-            
         }
 
-        if (xQueueSend(dataPressur_Queue_Ble, (void *)&DTH, NULL) != pdPASS)
+        if (xQueueSend(dataPressur_Queue_Ble, (void *)&DP, NULL) != pdPASS)
         {
-            /* Failed to post the message, even after 10 ticks. */
         }
 
-        if (xQueueSend(dataPressur_Queue_Screen, (void *)&DTH, NULL) != pdPASS)
+        if (xQueueSend(dataPressur_Queue_Screen, (void *)&DP, NULL) != pdPASS)
         {
-            /* Failed to post the message, even after 10 ticks. */
         }
+
+        xSemaphoreGive(I2CSema);
     }
-    xSemaphoreGive(I2CSema);
     vTaskDelete(NULL);
 }
 
@@ -115,16 +112,17 @@ void DataChoose()
     {
         xQueueReceive(s_timer_queue, &nb_occ_timer, portMAX_DELAY);
 
-        xTaskCreate(setDataMouv, "setDataMouv", 10000, NULL, 4, NULL);
+        xTaskCreatePinnedToCore(setDataMouv, "setDataMouv", 10000, NULL, 4, NULL, 1);
 
         if (nb_occ_timer % 10 == 0)
         {
-            xTaskCreate(setDataPressur, "setDataPressur", 10000, NULL, 4, NULL);
+
+            xTaskCreatePinnedToCore(setDataPressur, "setDataPressur", 10000, NULL, 4, NULL, 1);
         }
         if (nb_occ_timer % 100 == 0)
         {
 
-            xTaskCreate(setDataTempHumi, "setDataTempHumi", 10000, NULL, 4, NULL);
+            xTaskCreatePinnedToCore(setDataTempHumi, "setDataTempHumi", 10000, NULL, 4, NULL, 1);
         }
     }
 }

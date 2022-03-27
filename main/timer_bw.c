@@ -16,7 +16,7 @@ void IRAM_ATTR timer_group_isr_callback(void *args)
     }
 
     /* Now just send the event data back to the main program task */
-    if(eventTimer == 601){
+    if(eventTimer == 600){
         eventTimer = 0;
     }
     xQueueSendFromISR(s_timer_queue, &eventTimer, &high_task_awoken);
