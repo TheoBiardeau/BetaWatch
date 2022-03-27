@@ -242,9 +242,9 @@ static void guiTask()
     lv_obj_t *Value_ay = lv_label_create(b_ay, NULL);
     lv_obj_t *Value_az = lv_label_create(b_az, NULL);
 
-    lv_bar_set_range(b_ax, -5, 5);
-    lv_bar_set_range(b_ay, -5, 5);
-    lv_bar_set_range(b_az, -5, 5);
+    lv_bar_set_range(b_ax, -400, 400);
+    lv_bar_set_range(b_ay, -400, 400);
+    lv_bar_set_range(b_az, -400, 400);
 
     lv_obj_set_size(b_ax, 200, 20);
     lv_obj_set_size(b_ay, 200, 20);
@@ -302,7 +302,7 @@ static void guiTask()
     lv_obj_add_style(Az_c, LV_OBJ_PART_MAIN, &style_Blue);
 
     chart_acc = lv_chart_create(scr4, NULL);
-    lv_chart_set_range(chart_acc, 0, 10);
+    lv_chart_set_range(chart_acc, 0, 1000);
     lv_obj_set_size(chart_acc, 290, 180);
     lv_chart_set_point_count(chart_acc, 30);
     lv_obj_align(chart_acc, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, -20);
@@ -431,9 +431,9 @@ static void guiTask()
         {
             lv_scr_load(scr3);
             xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
-            lv_bar_set_value(b_ax, DM_Buff.Dacc_x, NULL);
-            lv_bar_set_value(b_ay, DM_Buff.Dacc_y, NULL);
-            lv_bar_set_value(b_az, DM_Buff.Dacc_z, NULL);
+            lv_bar_set_value(b_ax, DM_Buff.Dacc_x*100, NULL);
+            lv_bar_set_value(b_ay, DM_Buff.Dacc_y*100, NULL);
+            lv_bar_set_value(b_az, DM_Buff.Dacc_z*100, NULL);
             lv_label_set_text_fmt(Value_ax, "%.2f", DM_Buff.Dacc_x);
             lv_label_set_text_fmt(Value_ay, "%.2f", DM_Buff.Dacc_y);
             lv_label_set_text_fmt(Value_az, "%.2f", DM_Buff.Dacc_z);
@@ -444,9 +444,9 @@ static void guiTask()
             lv_scr_load(scr4);
             xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_chart_refresh(chart_acc);
-            lv_chart_set_next(chart_acc, ser1_acc, DM_Buff.Dacc_x + 5);
-            lv_chart_set_next(chart_acc, ser2_acc, DM_Buff.Dacc_y + 5);
-            lv_chart_set_next(chart_acc, ser3_acc, DM_Buff.Dacc_z + 5);
+            lv_chart_set_next(chart_acc, ser1_acc, DM_Buff.Dacc_x*100 + 500);
+            lv_chart_set_next(chart_acc, ser2_acc, DM_Buff.Dacc_y*100 + 500);
+            lv_chart_set_next(chart_acc, ser3_acc, DM_Buff.Dacc_z*100 + 500);
         }
         else if (chooseScreen == 4)
         {

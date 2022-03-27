@@ -26,6 +26,7 @@
 #define LV_TICK_PERIOD_MS 1
 #define RAND_MAX 5
 SemaphoreHandle_t xGuiSemaphore;
+#define LV_SPRINTF_CUSTOM 1 
 
 /**********************
  *  STATIC PROTOTYPES
