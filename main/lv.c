@@ -164,9 +164,9 @@ static void guiTask()
     lv_label_set_text(L_legend_Bwz, "wz");
     lv_label_set_text(L_legend_chart_BG, "Gyroscope en temps reel");
 
-    lv_label_set_text(L_legend_Bwx_u, "-180                                       180");
-    lv_label_set_text(L_legend_Bwy_u, "-180                                       180");
-    lv_label_set_text(L_legend_Bwz_u, "-180                                       180");
+    lv_label_set_text(L_legend_Bwx_u, "-720                                     720");
+    lv_label_set_text(L_legend_Bwy_u, "-720                                     720");
+    lv_label_set_text(L_legend_Bwz_u, "-720                                     720");
 
     /**********************************
      *  set object for screen 2 *
@@ -196,7 +196,7 @@ static void guiTask()
     lv_obj_add_style(wz, LV_OBJ_PART_MAIN, &style_Blue);
 
     chart_gyro = lv_chart_create(scr2, NULL);
-    lv_chart_set_range(chart_gyro, 0, 500);
+    lv_chart_set_range(chart_gyro, 0, 1440);
     lv_obj_set_size(chart_gyro, 290, 180);
     lv_chart_set_point_count(chart_gyro, 30);
     lv_obj_align(chart_gyro, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, -20);
@@ -221,7 +221,7 @@ static void guiTask()
 
     lv_label_set_text_fmt(L_legend_chart_G, "Gx           Gy          Gz");
     lv_label_set_text_fmt(L_legend_Gx, "T+3s              T+2s              T+1s                T");
-    lv_label_set_text_fmt(L_legend_Gy, "\n\n 4 m/s\n\n 2 m/s\n\n 0 m/s\n\n-2 m/s\n\n-4 m/s");
+    lv_label_set_text_fmt(L_legend_Gy, "\n\n720\n\n360 m/s\n\n 0 m/s\n\n-360 m/s\n\n-720 m/s");
     lv_label_set_text_fmt(Title_screen, "Gyroscope");
 
     /**********************************
@@ -423,9 +423,9 @@ static void guiTask()
             lv_scr_load(scr2);
             xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_chart_refresh(chart_gyro);
-            lv_chart_set_next(chart_gyro, ser1_gyro, DM_Buff.Dgyro_x*100 + 250);
-            lv_chart_set_next(chart_gyro, ser2_gyro, DM_Buff.Dgyro_y*100 + 250);
-            lv_chart_set_next(chart_gyro, ser3_gyro, DM_Buff.Dgyro_z*100 + 250);
+            lv_chart_set_next(chart_gyro, ser1_gyro, DM_Buff.Dgyro_x + 720);
+            lv_chart_set_next(chart_gyro, ser2_gyro, DM_Buff.Dgyro_y + 720);
+            lv_chart_set_next(chart_gyro, ser3_gyro, DM_Buff.Dgyro_z + 720);
         }
         else if (chooseScreen == 2)
         {
