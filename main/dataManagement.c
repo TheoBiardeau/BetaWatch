@@ -1,6 +1,7 @@
 #include "timer_bw.h"
 #include "LPS_user.h"
 #include "Accelero_et_Gyro.h"
+#include "HTS221_user.h"
 
 void initQueuesSensors()
 {
@@ -43,8 +44,8 @@ void setDataMouv()
 {
     if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
-        DM  = get_LSM6DSO();
-        printf("%f\n",DM.Dacc_x);
+        DM = get_LSM6DSO();
+        printf("%f\n", DM.Dacc_x);
 
         if (xQueueSend(dataMouvement_Queue_Sd, (void *)&DM, NULL) != pdPASS)
         {
@@ -69,7 +70,8 @@ void setDataTempHumi()
 
     if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
-        // DTH = getData
+        DTH = get_temphumi();
+        printf("temp %f", DTH.Dtemp);
 
         if (xQueueSend(dataTempHumi_Queue_Sd, (void *)&DTH, NULL) != pdPASS)
         {
