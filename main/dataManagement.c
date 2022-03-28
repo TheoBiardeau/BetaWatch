@@ -44,7 +44,7 @@ void setDataMouv()
     if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
         DM  = get_LSM6DSO();
-        printf("%f\n",DM.Dacc_x);
+        //printf("%f\n",DM.Dacc_x);
 
         if (xQueueSend(dataMouvement_Queue_Sd, (void *)&DM, NULL) != pdPASS)
         {

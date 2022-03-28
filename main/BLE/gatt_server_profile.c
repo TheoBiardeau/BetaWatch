@@ -26,6 +26,8 @@
 
 #include "gatt_server_profile.h"
 
+#include "../dataManagement.h"
+
 #define GATTS_SERVICE_UUID   0xFF10
 #define GATTS_CHAR_UUID      0xFF12
 #define GATTS_DESCR_UUID     0x3333
@@ -183,8 +185,18 @@ void gatts_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
         rsp.attr_value.handle = param->read.handle;
     
         if(param->read.handle == num_handle_char1) {
-            rsp.attr_value.len = 1;
-            rsp.attr_value.value[0] = 7;
+            uint8_t buf_steps = 0;
+            T_dataMouvement DM_ble;
+            
+            xQueueReceive(dataMouvement_Queue_Ble, &DM_ble, portMAX_DELAY);
+            
+            buf_steps = (uint8_t)DM_ble.steps;
+            
+            rsp.attr_value.len = sizeof(buf_steps);
+
+            printf("buf_steps: %d\n", buf_steps);
+
+            rsp.attr_value.value[0] = buf_steps;
         } else if(param->read.handle == num_handle_char2) {
             rsp.attr_value.len = 1;
             rsp.attr_value.value[0] = 2;
