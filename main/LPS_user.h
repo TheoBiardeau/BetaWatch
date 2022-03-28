@@ -47,3 +47,4 @@ lps22hh_reg_t reg_LPS22HH;
 static T_dataPressur DPLPS;
 
 T_dataPressur getPressure();
+esp_err_t i2c_master_init();

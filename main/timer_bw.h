@@ -6,6 +6,9 @@
    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
    CONDITIONS OF ANY KIND, either express or implied.
 */
+
+#ifndef TIMER_BW_H
+#define TIMER_BW_H
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -45,3 +48,5 @@ static uint32_t eventTimer;
  * @param timer_interval_sec interval of alarm
  */
 void timer_initAll(int group, int timer, bool auto_reload, float timer_interval_sec);
+
+#endif TIMER_BW_H

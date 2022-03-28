@@ -76,7 +76,7 @@ static int32_t i2c_master_write_slave(uint8_t i2c_num, uint8_t regaddr, uint8_t 
 /**
  * @brief i2c master initialization
  */
-static esp_err_t i2c_master_init(void)
+esp_err_t i2c_master_init()
 {
     int i2c_master_port = I2C_MASTER_NUM;
     i2c_config_t conf;
@@ -97,7 +97,6 @@ T_dataPressur getPressure()
 
     while (initloop)
     {
-        i2c_master_init();
 
         /* This acts as the entry point of ST's STTS751 driver */
         dev_ctx.write_reg = i2c_master_write_slave;

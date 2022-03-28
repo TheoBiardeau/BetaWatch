@@ -14,7 +14,7 @@ int data_test = 5;
 /**********************
  *   APPLICATION MAIN
  **********************/
-void launch()
+void launchLVGL()
 {
     /* If you want to use a task to create the graphic, you NEED to create a Pinned task
      * Otherwise there can be problem such as memory corruption and so on.
@@ -134,9 +134,9 @@ static void guiTask()
     lv_obj_t *Value_wy = lv_label_create(b_wy, NULL);
     lv_obj_t *Value_wz = lv_label_create(b_wz, NULL);
 
-    lv_bar_set_range(b_wx, -5, 5);
-    lv_bar_set_range(b_wy, -5, 5);
-    lv_bar_set_range(b_wz, -5, 5);
+    lv_bar_set_range(b_wx, -500, 500);
+    lv_bar_set_range(b_wy, -500, 500);
+    lv_bar_set_range(b_wz, -500, 500);
 
     lv_obj_set_size(b_wx, 200, 20);
     lv_obj_set_size(b_wy, 200, 20);
@@ -155,18 +155,18 @@ static void guiTask()
     lv_obj_align(L_legend_Bwy_u, NULL, LV_ALIGN_IN_LEFT_MID, 5, 0);
     lv_obj_align(L_legend_Bwz_u, NULL, LV_ALIGN_IN_LEFT_MID, 5, 0);
 
-    lv_obj_align(Value_wx, NULL, LV_ALIGN_CENTER, 13, 0);
-    lv_obj_align(Value_wy, NULL, LV_ALIGN_CENTER, 13, 0);
-    lv_obj_align(Value_wz, NULL, LV_ALIGN_CENTER, 13, 0);
+    lv_obj_align(Value_wx, NULL, LV_ALIGN_CENTER, 3, 0);
+    lv_obj_align(Value_wy, NULL, LV_ALIGN_CENTER, 3, 0);
+    lv_obj_align(Value_wz, NULL, LV_ALIGN_CENTER, 3, 0);
 
     lv_label_set_text(L_legend_Bwx, "wx");
     lv_label_set_text(L_legend_Bwy, "wy");
     lv_label_set_text(L_legend_Bwz, "wz");
     lv_label_set_text(L_legend_chart_BG, "Gyroscope en temps reel");
 
-    lv_label_set_text(L_legend_Bwx_u, "-10                                      10");
-    lv_label_set_text(L_legend_Bwy_u, "-10                                      10");
-    lv_label_set_text(L_legend_Bwz_u, "-10                                      10");
+    lv_label_set_text(L_legend_Bwx_u, "-5                                       5");
+    lv_label_set_text(L_legend_Bwy_u, "-5                                       5");
+    lv_label_set_text(L_legend_Bwz_u, "-5                                       5");
 
     /**********************************
      *  set object for screen 2 *
@@ -196,7 +196,7 @@ static void guiTask()
     lv_obj_add_style(wz, LV_OBJ_PART_MAIN, &style_Blue);
 
     chart_gyro = lv_chart_create(scr2, NULL);
-    lv_chart_set_range(chart_gyro, 0, 10);
+    lv_chart_set_range(chart_gyro, 0, 500);
     lv_obj_set_size(chart_gyro, 290, 180);
     lv_chart_set_point_count(chart_gyro, 30);
     lv_obj_align(chart_gyro, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, -20);
@@ -242,9 +242,9 @@ static void guiTask()
     lv_obj_t *Value_ay = lv_label_create(b_ay, NULL);
     lv_obj_t *Value_az = lv_label_create(b_az, NULL);
 
-    lv_bar_set_range(b_ax, -400, 400);
-    lv_bar_set_range(b_ay, -400, 400);
-    lv_bar_set_range(b_az, -400, 400);
+    lv_bar_set_range(b_ax, -200, 200);
+    lv_bar_set_range(b_ay, -200, 200);
+    lv_bar_set_range(b_az, -200, 200);
 
     lv_obj_set_size(b_ax, 200, 20);
     lv_obj_set_size(b_ay, 200, 20);
@@ -263,18 +263,18 @@ static void guiTask()
     lv_obj_align(L_legend_Bay_u, NULL, LV_ALIGN_IN_LEFT_MID, 5, 0);
     lv_obj_align(L_legend_Baz_u, NULL, LV_ALIGN_IN_LEFT_MID, 5, 0);
 
-    lv_obj_align(Value_ax, NULL, LV_ALIGN_CENTER, 13, 0);
-    lv_obj_align(Value_ay, NULL, LV_ALIGN_CENTER, 13, 0);
-    lv_obj_align(Value_az, NULL, LV_ALIGN_CENTER, 13, 0);
+    lv_obj_align(Value_ax, NULL, LV_ALIGN_CENTER, 3, 0);
+    lv_obj_align(Value_ay, NULL, LV_ALIGN_CENTER, 3, 0);
+    lv_obj_align(Value_az, NULL, LV_ALIGN_CENTER, 3, 0);
 
     lv_label_set_text(L_legend_Bax, "ax");
     lv_label_set_text(L_legend_Bay, "ay");
     lv_label_set_text(L_legend_Baz, "az");
     lv_label_set_text(L_legend_chart_BA, "Accelerometer en temps reel");
 
-    lv_label_set_text(L_legend_Bax_u, "-4                                       4");
-    lv_label_set_text(L_legend_Bay_u, "-4                                       4");
-    lv_label_set_text(L_legend_Baz_u, "-4                                       4");
+    lv_label_set_text(L_legend_Bax_u, "-2                                       2");
+    lv_label_set_text(L_legend_Bay_u, "-2                                       2");
+    lv_label_set_text(L_legend_Baz_u, "-2                                       2");
 
     /**********************************
      *  set object for screen 4 *
@@ -302,7 +302,7 @@ static void guiTask()
     lv_obj_add_style(Az_c, LV_OBJ_PART_MAIN, &style_Blue);
 
     chart_acc = lv_chart_create(scr4, NULL);
-    lv_chart_set_range(chart_acc, 0, 1000);
+    lv_chart_set_range(chart_acc, 0, 500);
     lv_obj_set_size(chart_acc, 290, 180);
     lv_chart_set_point_count(chart_acc, 30);
     lv_obj_align(chart_acc, NULL, LV_ALIGN_IN_BOTTOM_LEFT, 0, -20);
@@ -327,7 +327,7 @@ static void guiTask()
 
     lv_label_set_text_fmt(L_legend_chart_A, "Ax           Ay          Az");
     lv_label_set_text_fmt(L_legend_Ax, "T+3s              T+2s              T+1s                T");
-    lv_label_set_text_fmt(L_legend_Ay, "\n\n 4g\n\n 2g\n\n 0g\n\n-2g\n\n-4g");
+    lv_label_set_text_fmt(L_legend_Ay, "\n\n 2g\n\n 1g\n\n 0g\n\n-1g\n\n-2g");
     lv_label_set_text_fmt(Title_screen_acc, "Accelerometer");
 
     /**********************************
@@ -410,9 +410,9 @@ static void guiTask()
         {
             lv_scr_load(scr1);
             xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
-            lv_bar_set_value(b_wx, DM_Buff.Dgyro_x, NULL);
-            lv_bar_set_value(b_wy, DM_Buff.Dgyro_y, NULL);
-            lv_bar_set_value(b_wz, DM_Buff.Dgyro_z, NULL);
+            lv_bar_set_value(b_wx, DM_Buff.Dgyro_x*100, NULL);
+            lv_bar_set_value(b_wy, DM_Buff.Dgyro_y*100, NULL);
+            lv_bar_set_value(b_wz, DM_Buff.Dgyro_z*100, NULL);
             lv_label_set_text_fmt(Value_wx, "%.2f", DM_Buff.Dgyro_x);
             lv_label_set_text_fmt(Value_wy, "%.2f", DM_Buff.Dgyro_x);
             lv_label_set_text_fmt(Value_wz, "%.2f", DM_Buff.Dgyro_x);
@@ -423,9 +423,9 @@ static void guiTask()
             lv_scr_load(scr2);
             xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_chart_refresh(chart_gyro);
-            lv_chart_set_next(chart_gyro, ser1_gyro, DM_Buff.Dgyro_x);
-            lv_chart_set_next(chart_gyro, ser2_gyro, DM_Buff.Dgyro_y);
-            lv_chart_set_next(chart_gyro, ser3_gyro, DM_Buff.Dgyro_z);
+            lv_chart_set_next(chart_gyro, ser1_gyro, DM_Buff.Dgyro_x*100 + 250);
+            lv_chart_set_next(chart_gyro, ser2_gyro, DM_Buff.Dgyro_y*100 + 250);
+            lv_chart_set_next(chart_gyro, ser3_gyro, DM_Buff.Dgyro_z*100 + 250);
         }
         else if (chooseScreen == 2)
         {
@@ -444,9 +444,9 @@ static void guiTask()
             lv_scr_load(scr4);
             xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_chart_refresh(chart_acc);
-            lv_chart_set_next(chart_acc, ser1_acc, DM_Buff.Dacc_x*100 + 500);
-            lv_chart_set_next(chart_acc, ser2_acc, DM_Buff.Dacc_y*100 + 500);
-            lv_chart_set_next(chart_acc, ser3_acc, DM_Buff.Dacc_z*100 + 500);
+            lv_chart_set_next(chart_acc, ser1_acc, DM_Buff.Dacc_x*100 + 250);
+            lv_chart_set_next(chart_acc, ser2_acc, DM_Buff.Dacc_y*100 + 250);
+            lv_chart_set_next(chart_acc, ser3_acc, DM_Buff.Dacc_z*100 + 250);
         }
         else if (chooseScreen == 4)
         {

@@ -1,3 +1,6 @@
+#ifndef LV_H
+#define LV_H
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,7 +25,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define TAG "Gauge"
 #define LV_TICK_PERIOD_MS 1
 #define RAND_MAX 5
 SemaphoreHandle_t xGuiSemaphore;
@@ -33,7 +35,7 @@ SemaphoreHandle_t xGuiSemaphore;
  **********************/
 static void lv_tick_task(void *arg);
 static void guiTask();
-void launch();
+void launchLVGL();
 
 /**********************
  *  Variable
@@ -52,3 +54,5 @@ int gz;
 static T_dataMouvement DM_Buff;
 static T_dataPressur DP_Buff;
 static T_dataTempHumi DTH_Buff;
+
+#endif
