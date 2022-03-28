@@ -134,9 +134,9 @@ static void guiTask()
     lv_obj_t *Value_wy = lv_label_create(b_wy, NULL);
     lv_obj_t *Value_wz = lv_label_create(b_wz, NULL);
 
-    lv_bar_set_range(b_wx, -180, 180);
-    lv_bar_set_range(b_wy, -180, 180);
-    lv_bar_set_range(b_wz, -180, 180);
+    lv_bar_set_range(b_wx, -720, 720);
+    lv_bar_set_range(b_wy, -720, 720);
+    lv_bar_set_range(b_wz, -720, 720);
 
     lv_obj_set_size(b_wx, 200, 20);
     lv_obj_set_size(b_wy, 200, 20);
