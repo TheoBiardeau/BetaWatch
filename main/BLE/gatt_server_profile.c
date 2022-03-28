@@ -198,8 +198,18 @@ void gatts_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
 
             rsp.attr_value.value[0] = buf_steps;
         } else if(param->read.handle == num_handle_char2) {
-            rsp.attr_value.len = 1;
-            rsp.attr_value.value[0] = 2;
+            uint8_t buf_temperature = 0;
+            T_dataTempHumi TH_ble;
+
+            xQueueReceive(dataTempHumi_Queue_Ble, &TH_ble, portMAX_DELAY);
+
+            buf_temperature = (uint8_t)TH_ble.Dtemp;
+
+            rsp.attr_value.len = sizeof(buf_temperature);
+            
+            printf("buf_temperature: %d\n", buf_temperature);
+
+            rsp.attr_value.value[0] = buf_temperature;
         }
 
         esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id,
