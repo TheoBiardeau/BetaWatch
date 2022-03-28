@@ -12,6 +12,7 @@ void app_main(void)
     timer_initAll(TIMER_GROUP_0, TIMER_0, true, 0.1);
     initQueuesSensors();
     initGPIO();
+    ble_launch()
     launch(1);
     uint32_t test = 0;
     while (1)
