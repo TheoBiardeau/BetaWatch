@@ -93,7 +93,7 @@ esp_err_t i2c_master_init()
 T_dataPressur getPressure()
 {
     int ret;
-    int loop = 1;
+    int loop = 0;
 
     while (initloop)
     {
@@ -107,6 +107,10 @@ T_dataPressur getPressure()
         /* Set Output Data Rate */
         lps22hh_data_rate_set(&dev_ctx, LPS22HH_10_Hz_LOW_NOISE);
         initloop = 0;
+    }
+
+    if(initloop == 0) { // si le capteur est initialisé
+        loop = 1;
     }
 
     while (loop)

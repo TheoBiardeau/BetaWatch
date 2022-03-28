@@ -55,6 +55,7 @@ static axis3bit16_t data_raw_angular_rate_LSM6DSOX;
 TaskHandle_t xHandle_lsm6dso = NULL;
 uint8_t reg_LSM6DSOX;
 bool loopcond = 1;
+
 /**
  * @brief test code to read esp-i2c-slave like a memory device
  *        We need to fill the buffer of esp slave device, then master can read them out.
@@ -131,41 +132,54 @@ static esp_err_t i2c_master_init(void)
 
 T_dataMouvement get_LSM6DSO()
 {
+    int loop = 0;
+    
     while (loopcond)
     {
         lsm6dsoDriver.write_reg = i2c_master_write_slave;
         lsm6dsoDriver.read_reg = i2c_master_read_slave;
         lsm6dsoDriver.handle = SENSOR_BUS;
-        loopcond = 0;
+
+        /* Check device ID for LSM6DSOX accelerometer */
+        whoamI = 0;
+        lsm6dso_device_id_get(&lsm6dsoDriver, &whoamI);
+        /* Configure LSM6DSOX accelerometer */
+        if (whoamI == LSM6DSO_ID)
+        {
+            /* Restore default configuration */
+            lsm6dso_reset_set(&lsm6dsoDriver, PROPERTY_ENABLE);
+            do
+            {
+                lsm6dso_reset_get(&lsm6dsoDriver, &rst);
+            } while (rst);
+            /* Disable I3C interface */
+            lsm6dso_i3c_disable_set(&lsm6dsoDriver, LSM6DSO_I3C_DISABLE);
+            /* Enable Block Data Update */
+            lsm6dso_block_data_update_set(&lsm6dsoDriver, PROPERTY_ENABLE);
+            /* Set Output Data Rate */
+            lsm6dso_xl_data_rate_set(&lsm6dsoDriver, LSM6DSO_XL_ODR_6667Hz);
+            lsm6dso_gy_data_rate_set(&lsm6dsoDriver, LSM6DSO_GY_ODR_6667Hz);
+            /* Set full scale */
+            lsm6dso_xl_full_scale_set(&lsm6dsoDriver, LSM6DSO_2g);
+            lsm6dso_gy_full_scale_set(&lsm6dsoDriver, LSM6DSO_2000dps);
+            /* Configure filtering chain */
+            lsm6dso_xl_hp_path_on_out_set(&lsm6dsoDriver, LSM6DSO_LP_ODR_DIV_100);
+            lsm6dso_xl_filter_lp2_set(&lsm6dsoDriver, PROPERTY_ENABLE);
+
+            ESP_LOGI(TAG, "OK whoami : LSM6DSO");
+            loopcond = 0;
+        } else
+        {
+            ESP_LOGE(TAG, "ERROR whoami : LSM6DSO");
+            loopcond = 0;
+        }
     }
 
-    /* Check device ID for LSM6DSOX accelerometer */
-    whoamI = 0;
-    lsm6dso_device_id_get(&lsm6dsoDriver, &whoamI);
-    /* Configure LSM6DSOX accelerometer */
-    if (whoamI == LSM6DSO_ID)
-    {
-        /* Restore default configuration */
-        lsm6dso_reset_set(&lsm6dsoDriver, PROPERTY_ENABLE);
-        do
-        {
-            lsm6dso_reset_get(&lsm6dsoDriver, &rst);
-        } while (rst);
-        /* Disable I3C interface */
-        lsm6dso_i3c_disable_set(&lsm6dsoDriver, LSM6DSO_I3C_DISABLE);
-        /* Enable Block Data Update */
-        lsm6dso_block_data_update_set(&lsm6dsoDriver, PROPERTY_ENABLE);
-        /* Set Output Data Rate */
-        lsm6dso_xl_data_rate_set(&lsm6dsoDriver, LSM6DSO_XL_ODR_6667Hz);
-        lsm6dso_gy_data_rate_set(&lsm6dsoDriver, LSM6DSO_GY_ODR_6667Hz);
-        /* Set full scale */
-        lsm6dso_xl_full_scale_set(&lsm6dsoDriver, LSM6DSO_2g);
-        lsm6dso_gy_full_scale_set(&lsm6dsoDriver, LSM6DSO_2000dps);
-        /* Configure filtering chain */
-        lsm6dso_xl_hp_path_on_out_set(&lsm6dsoDriver, LSM6DSO_LP_ODR_DIV_100);
-        lsm6dso_xl_filter_lp2_set(&lsm6dsoDriver, PROPERTY_ENABLE);
+    if(loopcond == 0) { // si le capteur est initialisé
+        loop = 1;
+    }
 
-        ESP_LOGI(TAG, "OK whoami : LSM6DSO");
+    while(loop) {
         lsm6dso_xl_flag_data_ready_get(&lsm6dsoDriver, &reg_LSM6DSOX);
 
         if (reg_LSM6DSOX)
@@ -187,11 +201,9 @@ T_dataMouvement get_LSM6DSO()
             DMT.Dgyro_y = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[1])/1000000;
             DMT.Dgyro_z = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[2])/1000000;
         }
-    }
-    else
-    {
 
-        ESP_LOGE(TAG, "ERROR whoami : LSM6DSO");
+        loop = 0;
     }
+
     return DMT;
 }
