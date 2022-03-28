@@ -134,9 +134,9 @@ static void guiTask()
     lv_obj_t *Value_wy = lv_label_create(b_wy, NULL);
     lv_obj_t *Value_wz = lv_label_create(b_wz, NULL);
 
-    lv_bar_set_range(b_wx, -500, 500);
-    lv_bar_set_range(b_wy, -500, 500);
-    lv_bar_set_range(b_wz, -500, 500);
+    lv_bar_set_range(b_wx, -180, 180);
+    lv_bar_set_range(b_wy, -180, 180);
+    lv_bar_set_range(b_wz, -180, 180);
 
     lv_obj_set_size(b_wx, 200, 20);
     lv_obj_set_size(b_wy, 200, 20);
@@ -164,9 +164,9 @@ static void guiTask()
     lv_label_set_text(L_legend_Bwz, "wz");
     lv_label_set_text(L_legend_chart_BG, "Gyroscope en temps reel");
 
-    lv_label_set_text(L_legend_Bwx_u, "-5                                       5");
-    lv_label_set_text(L_legend_Bwy_u, "-5                                       5");
-    lv_label_set_text(L_legend_Bwz_u, "-5                                       5");
+    lv_label_set_text(L_legend_Bwx_u, "-180                                       180");
+    lv_label_set_text(L_legend_Bwy_u, "-180                                       180");
+    lv_label_set_text(L_legend_Bwz_u, "-180                                       180");
 
     /**********************************
      *  set object for screen 2 *
@@ -410,9 +410,9 @@ static void guiTask()
         {
             lv_scr_load(scr1);
             xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
-            lv_bar_set_value(b_wx, DM_Buff.Dgyro_x*100, NULL);
-            lv_bar_set_value(b_wy, DM_Buff.Dgyro_y*100, NULL);
-            lv_bar_set_value(b_wz, DM_Buff.Dgyro_z*100, NULL);
+            lv_bar_set_value(b_wx, DM_Buff.Dgyro_x, NULL);
+            lv_bar_set_value(b_wy, DM_Buff.Dgyro_y, NULL);
+            lv_bar_set_value(b_wz, DM_Buff.Dgyro_z, NULL);
             lv_label_set_text_fmt(Value_wx, "%.2f", DM_Buff.Dgyro_x);
             lv_label_set_text_fmt(Value_wy, "%.2f", DM_Buff.Dgyro_x);
             lv_label_set_text_fmt(Value_wz, "%.2f", DM_Buff.Dgyro_x);
