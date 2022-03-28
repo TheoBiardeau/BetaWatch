@@ -8,13 +8,8 @@
 #include "./BLE/ble_init.h"
 #include "./BLE/gatt_server_profile.h"
 
-void app_main() {
+void Ble_launch() {
     ble_init();
-
-    /*
-	for (uint8_t i=0; i<5;i++)
-		prof_shared_buf[i] = temp_tab[i];
-    */
 
 	esp_ble_gatts_register_callback(gatts_event_handler);
 

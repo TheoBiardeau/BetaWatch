@@ -29,20 +29,30 @@
 #define GATTS_SERVICE_UUID   0xFF10
 #define GATTS_CHAR_UUID      0xFF12
 #define GATTS_DESCR_UUID     0x3333
-#define GATTS_NUM_HANDLE     4
+#define GATTS_NUM_HANDLE     6
 
 #define TEST_DEVICE_NAME            "BetaWatch"
 //#define TEST_MANUFACTURER_DATA_LEN  17
 
 #define GATTS_DEMO_CHAR_VAL_LEN_MAX		0x40
 
-uint8_t char1_str[] = {0x11,0x22,0x33};
+uint8_t char1_str[] = {0x11};
+uint8_t char2_str_ben[] = {0x21,0x22};
+uint8_t num_handle_char1 = 0;
+uint8_t num_handle_char2 = 0;
 
 esp_attr_value_t gatts_demo_char1_val =
 {
 	.attr_max_len = GATTS_DEMO_CHAR_VAL_LEN_MAX,
 	.attr_len		= sizeof(char1_str),
 	.attr_value     = char1_str,
+};
+
+esp_attr_value_t gatts_demo_char2_val_ben =
+{
+	.attr_max_len = GATTS_DEMO_CHAR_VAL_LEN_MAX,
+	.attr_len		= sizeof(char2_str_ben),
+	.attr_value     = char2_str_ben,
 };
 
 static uint8_t test_service_uuid128[32] = {
@@ -171,8 +181,14 @@ void gatts_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
 
         //Here we fill the rsp (response) structure with our data (i.e. the temperature value).
         rsp.attr_value.handle = param->read.handle;
-        rsp.attr_value.len = 1;
-        rsp.attr_value.value[0] = 7;
+    
+        if(param->read.handle == num_handle_char1) {
+            rsp.attr_value.len = 1;
+            rsp.attr_value.value[0] = 7;
+        } else if(param->read.handle == num_handle_char2) {
+            rsp.attr_value.len = 1;
+            rsp.attr_value.value[0] = 2;
+        }
 
         esp_ble_gatts_send_response(gatts_if, param->read.conn_id, param->read.trans_id,
                                     ESP_GATT_OK, &rsp);
@@ -216,6 +232,11 @@ void gatts_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
                                ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE,
                                ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_NOTIFY,
                                &gatts_demo_char1_val, NULL);
+
+        esp_ble_gatts_add_char(gl_profile_tab[PROFILE_APP_ID].service_handle, &gl_profile_tab[PROFILE_APP_ID].char_uuid,
+                               ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE,
+                               ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_WRITE | ESP_GATT_CHAR_PROP_BIT_NOTIFY,
+                               &gatts_demo_char2_val_ben, NULL);
         break;
     case ESP_GATTS_ADD_INCL_SRVC_EVT:
         break;
@@ -229,6 +250,13 @@ void gatts_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
         gl_profile_tab[PROFILE_APP_ID].descr_uuid.len = ESP_UUID_LEN_16;
         gl_profile_tab[PROFILE_APP_ID].descr_uuid.uuid.uuid16 = ESP_GATT_UUID_CHAR_CLIENT_CONFIG;
         esp_ble_gatts_get_attr_value(param->add_char.attr_handle,  &length, &prf_char);
+
+        if(length == 1) {
+            num_handle_char1 = param->add_char.attr_handle;
+        }
+        if(length == 2) {
+            num_handle_char2 = param->add_char.attr_handle;
+        }
 
         ESP_LOGI(GATT_SERVER_TAG, "the gatts demo char length = %x\n", length);
         for(int i = 0; i < length; i++){
