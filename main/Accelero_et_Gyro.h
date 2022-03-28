@@ -1,5 +1,5 @@
-#ifndef MAIN_H_
-#define MAIN_H_
+#ifndef ACCGYRO_H
+#define ACCGYRO_H
 
 #include "dataManagement.h"
 
@@ -7,4 +7,4 @@ T_dataMouvement get_LSM6DSO();
 
 T_dataMouvement DMT;
 
-#endif /* MAIN_H_ */
+#endif /* ACCGYRO_H */
