@@ -1,7 +1,6 @@
 #include "timer_bw.h"
 #include "LPS_user.h"
 #include "Accelero_et_Gyro.h"
-#include "HTS221_user.h"
 #include "Clock.h"
 #include "Magnetometer.h"
 #include <time.h>
@@ -34,8 +33,6 @@ void initQueuesSensors()
     xTaskCreatePinnedToCore(DataChoose, "DataChoose", 10000, NULL, 4, NULL, 1);
 
     magnetometerInit();
-    clockInit();
-    clockSychronize();
     printf("init data ok \n");
 }
 
@@ -79,8 +76,6 @@ void setDataTempHumi()
 
     if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
-        DTH = get_temphumi();
-
         if (xQueueSend(dataTempHumi_Queue_Sd, (void *)&DTH, NULL) != pdPASS)
         {
             /* Failed to post the message, even after 10 ticks. */
@@ -116,7 +111,6 @@ void setDataPressur()
         if (xQueueSend(dataPressur_Queue_Screen, (void *)&DP, NULL) != pdPASS)
         {
         }
-        struct tm time = clockGetTime();
         xSemaphoreGive(I2CSema);
     }
     vTaskDelete(NULL);
