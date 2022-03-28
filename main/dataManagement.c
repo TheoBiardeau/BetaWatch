@@ -24,10 +24,10 @@ void initQueuesSensors()
     I2CSema = xSemaphoreCreateMutex();
     xSemaphoreGive(I2CSema);
 
+    xTaskCreatePinnedToCore(setDataPressur, "setDataPressur", 10000, NULL, 5, NULL, 1);
     xTaskCreatePinnedToCore(setDataMouv, "setDataMouv", 10000, NULL, 4, NULL, 1);
-    xTaskCreatePinnedToCore(setDataPressur, "setDataPressur", 10000, NULL, 4, NULL, 1);
     xTaskCreatePinnedToCore(setDataTempHumi, "setDataTempHumi", 10000, NULL, 4, NULL, 1);
-    xTaskCreatePinnedToCore(DataChoose, "DataChoose", 10000, NULL, 5, NULL, 0);
+    xTaskCreatePinnedToCore(DataChoose, "DataChoose", 10000, NULL, 4, NULL, 1);
     printf("init data ok \n");
 }
 

@@ -139,8 +139,6 @@ T_dataMouvement get_LSM6DSO()
         lsm6dsoDriver.write_reg = i2c_master_write_slave;
         lsm6dsoDriver.read_reg = i2c_master_read_slave;
         lsm6dsoDriver.handle = SENSOR_BUS;
-
-        /* Check device ID for LSM6DSOX accelerometer */
         whoamI = 0;
         lsm6dso_device_id_get(&lsm6dsoDriver, &whoamI);
         /* Configure LSM6DSOX accelerometer */
@@ -165,44 +163,31 @@ T_dataMouvement get_LSM6DSO()
             /* Configure filtering chain */
             lsm6dso_xl_hp_path_on_out_set(&lsm6dsoDriver, LSM6DSO_LP_ODR_DIV_100);
             lsm6dso_xl_filter_lp2_set(&lsm6dsoDriver, PROPERTY_ENABLE);
-
-            ESP_LOGI(TAG, "OK whoami : LSM6DSO");
-            loopcond = 0;
-        } else
-        {
-            ESP_LOGE(TAG, "ERROR whoami : LSM6DSO");
             loopcond = 0;
         }
     }
+    /* Check device ID for LSM6DSOX accelerometer */
 
-    if(loopcond == 0) { // si le capteur est initialisé
-        loop = 1;
+    lsm6dso_xl_flag_data_ready_get(&lsm6dsoDriver, &reg_LSM6DSOX);
+
+    if (reg_LSM6DSOX)
+    {
+        memset(data_raw_acceleration_LSM6DSOX.u8bit, 0x00, 3 * sizeof(int16_t));
+        lsm6dso_acceleration_raw_get(&lsm6dsoDriver, data_raw_acceleration_LSM6DSOX.u8bit);
+        DMT.Dacc_x = lsm6dso_from_fs2_to_mg(data_raw_acceleration_LSM6DSOX.i16bit[0]) / 1000;
+        DMT.Dacc_y = lsm6dso_from_fs2_to_mg(data_raw_acceleration_LSM6DSOX.i16bit[1]) / 1000;
+        DMT.Dacc_z = lsm6dso_from_fs2_to_mg(data_raw_acceleration_LSM6DSOX.i16bit[2]) / 1000;
     }
 
-    while(loop) {
-        lsm6dso_xl_flag_data_ready_get(&lsm6dsoDriver, &reg_LSM6DSOX);
+    lsm6dso_gy_flag_data_ready_get(&lsm6dsoDriver, &reg_LSM6DSOX);
 
-        if (reg_LSM6DSOX)
-        {
-            memset(data_raw_acceleration_LSM6DSOX.u8bit, 0x00, 3 * sizeof(int16_t));
-            lsm6dso_acceleration_raw_get(&lsm6dsoDriver, data_raw_acceleration_LSM6DSOX.u8bit);
-            DMT.Dacc_x = lsm6dso_from_fs2_to_mg(data_raw_acceleration_LSM6DSOX.i16bit[0])/1000;
-            DMT.Dacc_y = lsm6dso_from_fs2_to_mg(data_raw_acceleration_LSM6DSOX.i16bit[1])/1000;
-            DMT.Dacc_z = lsm6dso_from_fs2_to_mg(data_raw_acceleration_LSM6DSOX.i16bit[2])/1000;
-        }
-
-        lsm6dso_gy_flag_data_ready_get(&lsm6dsoDriver, &reg_LSM6DSOX);
-
-        if (reg_LSM6DSOX)
-        {
-            memset(data_raw_angular_rate_LSM6DSOX.u8bit, 0x00, 3 * sizeof(int16_t));
-            lsm6dso_angular_rate_raw_get(&lsm6dsoDriver, data_raw_angular_rate_LSM6DSOX.u8bit);
-            DMT.Dgyro_x = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[0])/1000000;
-            DMT.Dgyro_y = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[1])/1000000;
-            DMT.Dgyro_z = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[2])/1000000;
-        }
-
-        loop = 0;
+    if (reg_LSM6DSOX)
+    {
+        memset(data_raw_angular_rate_LSM6DSOX.u8bit, 0x00, 3 * sizeof(int16_t));
+        lsm6dso_angular_rate_raw_get(&lsm6dsoDriver, data_raw_angular_rate_LSM6DSOX.u8bit);
+        DMT.Dgyro_x = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[0]) / 1000;
+        DMT.Dgyro_y = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[1]) / 1000;
+        DMT.Dgyro_z = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[2]) / 1000;
     }
 
     return DMT;
