@@ -6,7 +6,7 @@
    Author: Henintsoa Andrianarivony.
  **************************************************************/
 
-#include "Clock.h";
+#include "Clock.h"
 
 /*** FOR THE RTC ***/
 
@@ -97,7 +97,6 @@ static void sntpSynch(void) {
 
 // - Initialize clock
 void clockInit(void) {
-    i2c_master_init();
 
     rv3029Driver.write_reg = i2c_master_write_RTC;
     rv3029Driver.read_reg = i2c_master_read_RTC;
@@ -127,14 +126,14 @@ void clockSychronize() {
 }
 
 // - Get the timestamp of the current clock time 
-time_t clockGetTime() {
+struct tm clockGetTime() {
     struct tm tm_now;
     
     // Grab current time from the RTC
     rv3029c2_time_get(&rv3029Driver, &tm_now);
     displayTime(); //DEBUG : uncomment the line to debug the sensor
 
-    return mktime(&tm_now);
+    return tm_now;
 }
 
 // - Monitoring data via UART serial port

@@ -1,3 +1,7 @@
+#ifndef LPS_USER_H
+#define LPS_USER_H
+
+
 #include <stdio.h>
 #include <string.h>
 #include "esp_log.h"
@@ -41,10 +45,11 @@ stmdev_ctx_t dev_ctx;
 
 static uint32_t data_raw_pressure;
 
-
 lps22hh_reg_t reg_LPS22HH;
 
 static T_dataPressur DPLPS;
 
 T_dataPressur getPressure();
 esp_err_t i2c_master_init();
+
+#endif

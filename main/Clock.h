@@ -87,7 +87,7 @@ void clockInit(void);
 // - Synchronize clock
 void clockSychronize();
 // - Get the timestamp of the current clock time 
-time_t clockGetTime();
+struct tm clockGetTime();
 // - Monitoring data via UART serial port
 static void displayTime();
 

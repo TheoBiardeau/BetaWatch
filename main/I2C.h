@@ -40,8 +40,6 @@
 #define NACK_VAL 0x1                            /*!< I2C nack value */
 
 
-// - Init I2C bus
-esp_err_t i2c_master_init(void);
 // - Read in a slave component
 int32_t i2c_master_read_slave(uint8_t i2c_addr_sensor, uint8_t i2c_num, uint8_t regaddr, uint8_t *data_rd, uint16_t size);
 // - Write in a slave component

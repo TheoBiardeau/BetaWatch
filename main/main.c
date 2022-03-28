@@ -8,6 +8,8 @@
 #include "Gpio_bw.h"
 #include "BLE.h"
 #include "LPS_user.h"
+
+
 void app_main(void)
 {
     i2c_master_init();
@@ -22,6 +24,8 @@ void app_main(void)
         xQueueReceive(s_timer_queue, &test, portMAX_DELAY);
         printf("Number of alarm %d \n", test);
         printf("%d \n", chooseScreen);
+
+                
 
     }
 }

@@ -100,6 +100,9 @@ struct rv3029_data {
 	int irq;
 };
 
+#ifndef MEMS_SHARED_TYPES
+#define MEMS_SHARED_TYPES
+
 /** @addtogroup  Interfaces_Functions
   * @brief       This section provide a set of functions used to read and
   *              write a generic register of the device.
@@ -111,12 +114,15 @@ typedef int32_t (*stmdev_write_ptr)(void *, uint8_t, const uint8_t *, uint16_t);
 typedef int32_t (*stmdev_read_ptr)(void *, uint8_t, uint8_t *, uint16_t);
 
 typedef struct {
-  /** Component mandatory fields **/
+  //Component mandatory fields
   stmdev_write_ptr  write_reg;
   stmdev_read_ptr   read_reg;
-  /** Customizable optional pointer **/
+  //Customizable optional pointer
   void *handle;
 } stmdev_ctx_t;
+
+#endif // MEMS SHARED TYPES
+
 
 struct rtc_wkalrm {
         unsigned char enabled;        /* 0 = alarm disabled, 1 = alarm enabled */
