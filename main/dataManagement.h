@@ -27,6 +27,8 @@ typedef struct
     float Dgyro_y;
     float Dgyro_z;
 
+    uint8_t steps;
+
 } T_dataMouvement;
 
 typedef struct

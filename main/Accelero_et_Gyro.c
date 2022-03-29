@@ -47,11 +47,13 @@ typedef union
 } axis3bit16_t;
 
 static uint8_t whoamI, rst;
+lsm6dso_emb_sens_t emb_sens;
 stmdev_ctx_t lsm6dsoDriver;
 // static float angular_rate_mdps_LSM6DSOX[3];
 // static float acceleration_mg_LSM6DSOX[3];
 static axis3bit16_t data_raw_acceleration_LSM6DSOX;
 static axis3bit16_t data_raw_angular_rate_LSM6DSOX;
+static uint8_t raw_steps;
 TaskHandle_t xHandle_lsm6dso = NULL;
 uint8_t reg_LSM6DSOX;
 bool loopcond = 1;
@@ -163,6 +165,13 @@ T_dataMouvement get_LSM6DSO()
             /* Configure filtering chain */
             lsm6dso_xl_hp_path_on_out_set(&lsm6dsoDriver, LSM6DSO_LP_ODR_DIV_100);
             lsm6dso_xl_filter_lp2_set(&lsm6dsoDriver, PROPERTY_ENABLE);
+            // reset steps pedometer
+            lsm6dso_steps_reset(&lsm6dsoDriver);
+            lsm6dso_pedo_sens_set(&lsm6dsoDriver, LSM6DSO_FALSE_STEP_REJ_ADV_MODE);
+            emb_sens.step = PROPERTY_ENABLE;
+            emb_sens.step_adv = PROPERTY_ENABLE;
+            lsm6dso_embedded_sens_set(&lsm6dsoDriver, &emb_sens);
+
             loopcond = 0;
         }
     }
@@ -189,6 +198,11 @@ T_dataMouvement get_LSM6DSO()
         DMT.Dgyro_y = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[1]) / 1000;
         DMT.Dgyro_z = lsm6dso_from_fs2000_to_mdps(data_raw_angular_rate_LSM6DSOX.i16bit[2]) / 1000;
     }
+
+    // Lit le nombre de pas
+    lsm6dso_number_of_steps_get(&lsm6dsoDriver, &raw_steps);
+    DMT.steps = raw_steps;
+    printf("nombre de pas %d\n", raw_steps);
 
     return DMT;
 }
