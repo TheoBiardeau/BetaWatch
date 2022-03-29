@@ -86,7 +86,7 @@ void initQueuesSensors();
 void setDataMouv();
 void setDataTempHumi();
 void setDataPressur();
-
+void getTimeOfClock();
 void saveAllData();
 
 void DataChoose();

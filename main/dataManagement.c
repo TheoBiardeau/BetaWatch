@@ -30,6 +30,7 @@ void initQueuesSensors()
     xTaskCreatePinnedToCore(setDataPressur, "setDataPressur", 10000, NULL, 5, NULL, 1);
     xTaskCreatePinnedToCore(setDataMouv, "setDataMouv", 10000, NULL, 4, NULL, 1);
     xTaskCreatePinnedToCore(setDataTempHumi, "setDataTempHumi", 10000, NULL, 4, NULL, 1);
+    xTaskCreatePinnedToCore(getTimeOfClock, "getTimeOfClock", 10000, NULL, 4, NULL, 1);
     xTaskCreatePinnedToCore(DataChoose, "DataChoose", 10000, NULL, 4, NULL, 1);
 
     magnetometerInit();
@@ -65,7 +66,6 @@ void setDataMouv()
         {
         }
 
-        
         xSemaphoreGive(I2CSema);
     }
     vTaskDelete(NULL);
@@ -116,6 +116,16 @@ void setDataPressur()
     vTaskDelete(NULL);
 }
 
+void getTimeOfClock()
+{
+    if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
+    {
+        struct tm tm_on_task = clockGetTime();
+        xSemaphoreGive(I2CSema);
+    }
+    vTaskDelete(NULL);
+}
+
 void DataChoose()
 {
     while (1)
@@ -128,6 +138,8 @@ void DataChoose()
         {
 
             xTaskCreatePinnedToCore(setDataPressur, "setDataPressur", 10000, NULL, 4, NULL, 1);
+
+            xTaskCreatePinnedToCore(getTimeOfClock, "getTimeOfClock", 10000, NULL, 4, NULL, 1);
         }
         if (nb_occ_timer % 100 == 0)
         {
