@@ -401,7 +401,7 @@ static void guiTask()
      *********************************/
     static lv_style_t style_Police;
     lv_style_init(&style_Police);
-    
+
     lv_obj_t *Time = lv_label_create(scr8, NULL);
     lv_obj_set_size(Time, 50, 30);
     lv_obj_set_pos(Time, 30, 250);
@@ -477,10 +477,12 @@ static void guiTask()
             lv_scr_load(scr8);
             char strftime_buf[64];
             xQueueReceive(dataTime_Queue_Screen, &timeinfo, portMAX_DELAY);
-
-            // Set timezone to France Standard Time and stringify time
-            setenv("TZ", "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00", 1);
+            time_t now;
+            time(&now);
+            // Set timezone to China Standard Time
+            setenv("TZ", "CST-0", 1);
             tzset();
+            localtime_r(&now, &timeinfo);
             strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
             printf("%s\n", strftime_buf);
             lv_label_set_text_fmt(Time, "%s", strftime_buf);
