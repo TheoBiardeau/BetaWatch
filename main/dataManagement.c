@@ -30,14 +30,13 @@ void initQueuesSensors()
     I2CSema = xSemaphoreCreateMutex();
     xSemaphoreGive(I2CSema);
 
-    xTaskCreatePinnedToCore(setDataPressur, "setDataPressur", 10000, NULL, 5, NULL, 1);
-    xTaskCreatePinnedToCore(setDataMouv, "setDataMouv", 10000, NULL, 4, NULL, 1);
-    xTaskCreatePinnedToCore(setDataTempHumi, "setDataTempHumi", 10000, NULL, 4, NULL, 1);
-    xTaskCreatePinnedToCore(getTimeOfClock, "getTimeOfClock", 10000, NULL, 4, NULL, 1);
-    xTaskCreatePinnedToCore(setDataMagn, "setDataMagn", 10000, NULL, 4, NULL, 1);
+    xTaskCreatePinnedToCore(setDataPressure_Task, "setDataPressure_Task", 10000, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(setDataMouv_Task, "setDataMouv_Task", 10000, NULL, 4, NULL, 1);
+    xTaskCreatePinnedToCore(setDataTempHumi_Task, "setDataTempHumi_Task", 10000, NULL, 4, NULL, 1);
+    xTaskCreatePinnedToCore(getTimeOfClock_Task, "getTimeOfClock_Task", 10000, NULL, 4, NULL, 1);
+    xTaskCreatePinnedToCore(setDataMagn_Task, "setDataMagn_Task", 10000, NULL, 4, NULL, 1);
     xTaskCreatePinnedToCore(DataChoose, "DataChoose", 10000, NULL, 4, NULL, 1);
 
-    magnetometerInit();
     printf("init data ok \n");
 }
 
@@ -49,7 +48,7 @@ void saveAllData()
     xQueueReset(dataPressur_Queue_Sd);
 }
 
-void setDataMouv()
+void setDataMouv_Task()
 {
     if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
@@ -79,7 +78,7 @@ void setDataMouv()
     vTaskDelete(NULL);
 }
 
-void setDataMagn()
+void setDataMagn_Task()
 {
     if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
@@ -90,7 +89,7 @@ void setDataMagn()
     vTaskDelete(NULL);
 }
 
-void setDataTempHumi()
+void setDataTempHumi_Task()
 {
 
     if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
@@ -114,7 +113,7 @@ void setDataTempHumi()
     vTaskDelete(NULL);
 }
 
-void setDataPressur()
+void setDataPressure_Task()
 {
     if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
@@ -135,7 +134,7 @@ void setDataPressur()
     vTaskDelete(NULL);
 }
 
-void getTimeOfClock()
+void getTimeOfClock_Task()
 {
     if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
@@ -162,21 +161,21 @@ void DataChoose()
     {
         xQueueReceive(s_timer_queue, &nb_occ_timer, portMAX_DELAY);
 
-        xTaskCreatePinnedToCore(setDataMouv, "setDataMouv", 10000, NULL, 4, NULL, 1);
+        xTaskCreatePinnedToCore(setDataMouv_Task, "setDataMouv_Task", 10000, NULL, 4, NULL, 1);
 
-        xTaskCreatePinnedToCore(setDataMagn, "setDataMagn", 10000, NULL, 4, NULL, 1);
+        xTaskCreatePinnedToCore(setDataMagn_Task, "setDataMagn_Task", 10000, NULL, 4, NULL, 1);
 
         if (nb_occ_timer % 10 == 0)
         {
 
-            xTaskCreatePinnedToCore(setDataPressur, "setDataPressur", 10000, NULL, 4, NULL, 1);
+            xTaskCreatePinnedToCore(setDataPressure_Task, "setDataPressure_Task", 10000, NULL, 4, NULL, 1);
 
-            xTaskCreatePinnedToCore(getTimeOfClock, "getTimeOfClock", 10000, NULL, 4, NULL, 1);
+            xTaskCreatePinnedToCore(getTimeOfClock_Task, "getTimeOfClock_Task", 10000, NULL, 4, NULL, 1);
         }
         if (nb_occ_timer % 100 == 0)
         {
 
-            xTaskCreatePinnedToCore(setDataTempHumi, "setDataTempHumi", 10000, NULL, 4, NULL, 1);
+            xTaskCreatePinnedToCore(setDataTempHumi_Task, "setDataTempHumi_Task", 10000, NULL, 4, NULL, 1);
         }
     }
 }

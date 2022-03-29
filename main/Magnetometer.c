@@ -8,6 +8,8 @@
 
 #include "Magnetometer.h"
 
+bool confcond = 1;
+
 // - I2C functions to read/write regs into Magnetometer sensor
 static int32_t i2c_master_read_Megnetometer(uint8_t i2c_num, uint8_t regaddr, uint8_t *data_rd, uint16_t size)
 {
@@ -63,7 +65,13 @@ bool magnetometerInit()
 // - Refresh magnetic values
 T_dataMagnetique magnetometerCapture()
 {
-
+    if (confcond == 1)
+    {
+        confcond = 0;
+        printf("begore init\n");
+        magnetometerInit();
+        printf("after init\n");
+    }
     uint8_t reg;
     /* Read output only if new value is available */
     lis2mdl_mag_data_ready_get(&Driver_Magnetometer, &reg);
@@ -77,7 +85,7 @@ T_dataMagnetique magnetometerCapture()
         Dmagne.Dmagn_y = lis2mdl_from_lsb_to_mgauss(data_raw_magnetic[1]);
         Dmagne.Dmagn_z = lis2mdl_from_lsb_to_mgauss(data_raw_magnetic[2]);
 
-        //displayMagnetic(); // DEBUG : uncomment the line to debug the sensor
+        // displayMagnetic(); // DEBUG : uncomment the line to debug the sensor
     }
     return Dmagne;
 }

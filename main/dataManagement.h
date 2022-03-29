@@ -91,12 +91,12 @@ QueueHandle_t dataTime_Queue_Screen ;
 
 void initQueuesSensors();
 
-void setDataMouv();
-void setDataTempHumi();
-void setDataPressur();
-void getTimeOfClock();
-void saveAllData();
-void setDataMagn();
+void setDataMouv_Task();
+void setDataTempHumi_Task();
+void setDataPressure_Task();
+void getTimeOfClock_Task();
+void saveAllData_Task();
+void setDataMagn_Task();
 
 void DataChoose();
 /*******************************
