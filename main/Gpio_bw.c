@@ -7,7 +7,7 @@ void IRAM_ATTR GPIO_iterupt(void *arg)
     if (((uint32_t)arg == GPIO_BUTTON) ? 1 : 0)
     {
 
-        if (chooseScreen < 6 && chooseScreen >= 0)
+        if (chooseScreen < 8 && chooseScreen >= 0)
         {
             chooseScreen++;
         }

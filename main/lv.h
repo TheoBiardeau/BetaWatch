@@ -28,7 +28,7 @@
 #define LV_TICK_PERIOD_MS 1
 #define RAND_MAX 5
 SemaphoreHandle_t xGuiSemaphore;
-#define LV_SPRINTF_CUSTOM 1 
+#define LV_SPRINTF_CUSTOM 1
 
 /**********************
  *  STATIC PROTOTYPES
@@ -54,5 +54,7 @@ int gz;
 static T_dataMouvement DM_Buff;
 static T_dataPressur DP_Buff;
 static T_dataTempHumi DTH_Buff;
+
+static struct tm timeinfo;
 
 #endif

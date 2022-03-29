@@ -24,6 +24,10 @@ void initQueuesSensors()
     dataPressur_Queue_Ble = xQueueCreate(1, sizeof(DP));
     dataPressur_Queue_Screen = xQueueCreate(1, sizeof(DP));
 
+    dataTime_Queue_Sd = xQueueCreate(SIZE_PRESURE, sizeof(DP));
+    dataTime_Queue_Ble = xQueueCreate(1, sizeof(DP));
+    dataTime_Queue_Screen = xQueueCreate(1, sizeof(DP));
+
     I2CSema = xSemaphoreCreateMutex();
     xSemaphoreGive(I2CSema);
 
@@ -121,6 +125,17 @@ void getTimeOfClock()
     if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
         struct tm tm_on_task = clockGetTime();
+        if (xQueueSend(dataTime_Queue_Screen, (void *)&tm_on_task, NULL) != pdPASS)
+        {
+        }
+
+        if (xQueueSend(dataTime_Queue_Screen, (void *)&tm_on_task, NULL) != pdPASS)
+        {
+        }
+
+        if (xQueueSend(dataTime_Queue_Screen, (void *)&tm_on_task, NULL) != pdPASS)
+        {
+        }
         xSemaphoreGive(I2CSema);
     }
     vTaskDelete(NULL);

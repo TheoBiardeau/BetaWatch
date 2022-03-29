@@ -9,6 +9,7 @@
  * CONDITIONS OF ANY KIND, either express or implied.
  */
 #include "lv.h"
+#include <time.h>
 int chooseScreen = 0;
 int data_test = 5;
 /**********************
@@ -116,6 +117,7 @@ static void guiTask()
     lv_obj_add_style(scr5, LV_OBJ_PART_MAIN, &style_Screen);
     lv_obj_add_style(scr6, LV_OBJ_PART_MAIN, &style_Screen);
     lv_obj_add_style(scr7, LV_OBJ_PART_MAIN, &style_Screen);
+    lv_obj_add_style(scr8, LV_OBJ_PART_MAIN, &style_Screen);
 
     /**********************************
      *  set object for screen 1 *
@@ -399,9 +401,11 @@ static void guiTask()
      *********************************/
     static lv_style_t style_Police;
     lv_style_init(&style_Police);
-    lv_obj_t *Clock = lv_label_create(scr8, NULL);
-    lv_obj_align(Clock, NULL, LV_ALIGN_CENTER, -10, 0);
-    lv_label_set_text_fmt(Clock, "%d h %d m %d s", 10, 20, 59);
+    
+    lv_obj_t *Time = lv_label_create(scr8, NULL);
+    lv_obj_set_size(Time, 50, 30);
+    lv_obj_set_pos(Time, 30, 250);
+    lv_obj_align(Time, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0);
     while (1)
     {
         lv_task_handler();
@@ -431,9 +435,9 @@ static void guiTask()
         {
             lv_scr_load(scr3);
             xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
-            lv_bar_set_value(b_ax, DM_Buff.Dacc_x*100, NULL);
-            lv_bar_set_value(b_ay, DM_Buff.Dacc_y*100, NULL);
-            lv_bar_set_value(b_az, DM_Buff.Dacc_z*100, NULL);
+            lv_bar_set_value(b_ax, DM_Buff.Dacc_x * 100, NULL);
+            lv_bar_set_value(b_ay, DM_Buff.Dacc_y * 100, NULL);
+            lv_bar_set_value(b_az, DM_Buff.Dacc_z * 100, NULL);
             lv_label_set_text_fmt(Value_ax, "%.2f", DM_Buff.Dacc_x);
             lv_label_set_text_fmt(Value_ay, "%.2f", DM_Buff.Dacc_y);
             lv_label_set_text_fmt(Value_az, "%.2f", DM_Buff.Dacc_z);
@@ -444,9 +448,9 @@ static void guiTask()
             lv_scr_load(scr4);
             xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
             lv_chart_refresh(chart_acc);
-            lv_chart_set_next(chart_acc, ser1_acc, DM_Buff.Dacc_x*100 + 250);
-            lv_chart_set_next(chart_acc, ser2_acc, DM_Buff.Dacc_y*100 + 250);
-            lv_chart_set_next(chart_acc, ser3_acc, DM_Buff.Dacc_z*100 + 250);
+            lv_chart_set_next(chart_acc, ser1_acc, DM_Buff.Dacc_x * 100 + 250);
+            lv_chart_set_next(chart_acc, ser2_acc, DM_Buff.Dacc_y * 100 + 250);
+            lv_chart_set_next(chart_acc, ser3_acc, DM_Buff.Dacc_z * 100 + 250);
         }
         else if (chooseScreen == 4)
         {
@@ -465,8 +469,21 @@ static void guiTask()
         {
             lv_scr_load(scr7);
             xQueueReceive(dataPressur_Queue_Screen, &DP_Buff, portMAX_DELAY);
-            lv_gauge_set_value(pressure_gauge,0,(int)DP_Buff.Dpressure);
+            lv_gauge_set_value(pressure_gauge, 0, (int)DP_Buff.Dpressure);
             lv_task_handler();
+        }
+        else if (chooseScreen == 7)
+        {
+            lv_scr_load(scr8);
+            char strftime_buf[64];
+            xQueueReceive(dataTime_Queue_Screen, &timeinfo, portMAX_DELAY);
+
+            // Set timezone to France Standard Time and stringify time
+            setenv("TZ", "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00", 1);
+            tzset();
+            strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+            printf("%s\n", strftime_buf);
+            lv_label_set_text_fmt(Time, "%s", strftime_buf);
         }
     }
 }

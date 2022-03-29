@@ -77,6 +77,10 @@ QueueHandle_t dataPressur_Queue_Sd ;
 QueueHandle_t dataPressur_Queue_Ble ; 
 QueueHandle_t dataPressur_Queue_Screen ; 
 
+QueueHandle_t dataTime_Queue_Sd ; 
+QueueHandle_t dataTime_Queue_Ble ; 
+QueueHandle_t dataTime_Queue_Screen ; 
+
 /*******************************
  *       Prototype fonction    *
  *******************************/
