@@ -14,15 +14,16 @@
 void app_main(void)
 {
     i2c_master_init();
+    clockInit();
+    clockSychronize();
     timer_initAll(TIMER_GROUP_0, TIMER_0, true, 0.1);
     initQueuesSensors();
     initGPIO();
     // Ble_launch();
     launchLVGL(1);
-
-    clockInit();
-    clockSychronize();
     uint32_t test = 0;
+
+    
     while (1)
     {
         xQueueReceive(s_timer_queue, &test, portMAX_DELAY);
