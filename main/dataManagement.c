@@ -3,7 +3,6 @@
 #include "Accelero_et_Gyro.h"
 #include "Clock.h"
 #include "Magnetometer.h"
-#include <time.h>
 
 void initQueuesSensors()
 {
@@ -35,6 +34,7 @@ void initQueuesSensors()
     xTaskCreatePinnedToCore(setDataMouv, "setDataMouv", 10000, NULL, 4, NULL, 1);
     xTaskCreatePinnedToCore(setDataTempHumi, "setDataTempHumi", 10000, NULL, 4, NULL, 1);
     xTaskCreatePinnedToCore(getTimeOfClock, "getTimeOfClock", 10000, NULL, 4, NULL, 1);
+    xTaskCreatePinnedToCore(setDataMagn, "setDataMagn", 10000, NULL, 4, NULL, 1);
     xTaskCreatePinnedToCore(DataChoose, "DataChoose", 10000, NULL, 4, NULL, 1);
 
     magnetometerInit();
@@ -55,6 +55,7 @@ void setDataMouv()
     {
         DM = get_LSM6DSO();
         DMA = magnetometerCapture();
+        printf("%f \n", DMA.Dmagn_x);
 
         if (xQueueSend(dataMouvement_Queue_Sd, (void *)&DM, NULL) != pdPASS)
         {
@@ -69,6 +70,20 @@ void setDataMouv()
         if (xQueueSend(dataMouvement_Queue_Screen, (void *)&DM, NULL) != pdPASS)
         {
         }
+
+        if (xQueueSend(dataMagn_Queue_Screen, (void *)&DMA, NULL) != pdPASS)
+        {
+        }
+        xSemaphoreGive(I2CSema);
+    }
+    vTaskDelete(NULL);
+}
+
+void setDataMagn()
+{
+    if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
+    {
+        DMA = magnetometerCapture();
 
         xSemaphoreGive(I2CSema);
     }
@@ -124,7 +139,7 @@ void getTimeOfClock()
 {
     if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
     {
-        struct tm tm_on_task = clockGetTime();
+        tm_on_task = clockGetTime();
         if (xQueueSend(dataTime_Queue_Screen, (void *)&tm_on_task, NULL) != pdPASS)
         {
         }
@@ -148,6 +163,8 @@ void DataChoose()
         xQueueReceive(s_timer_queue, &nb_occ_timer, portMAX_DELAY);
 
         xTaskCreatePinnedToCore(setDataMouv, "setDataMouv", 10000, NULL, 4, NULL, 1);
+
+        xTaskCreatePinnedToCore(setDataMagn, "setDataMagn", 10000, NULL, 4, NULL, 1);
 
         if (nb_occ_timer % 10 == 0)
         {

@@ -119,7 +119,7 @@ void clockSychronize() {
 
     if (ret == ESP_OK) {
         ESP_LOGI(TAG_CLOCK, "Device is properly synchronized.");
-        displayTime(); //DEBUG : uncomment the line to debug the sensor
+        //displayTime(); //DEBUG : uncomment the line to debug the sensor
     } else {
         ESP_LOGE(TAG_CLOCK, "Divice cannot be synchronized.");
     }
@@ -131,7 +131,7 @@ struct tm clockGetTime() {
     
     // Grab current time from the RTC
     rv3029c2_time_get(&rv3029Driver, &tm_now);
-    displayTime(); //DEBUG : uncomment the line to debug the sensor
+    //displayTime(); //DEBUG : uncomment the line to debug the sensor
 
     return tm_now;
 }

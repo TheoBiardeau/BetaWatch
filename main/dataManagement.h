@@ -7,6 +7,7 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
+#include <time.h>
 /*******************************
  *           const             *
  *******************************/
@@ -59,6 +60,7 @@ static T_dataMouvement DM;
 static T_dataPressur DP;
 static T_dataTempHumi DTH;
 static T_dataMagnetique DMA;
+struct tm tm_on_task;
 /*******************************
  *            Queue            *
  *******************************/
@@ -94,6 +96,7 @@ void setDataTempHumi();
 void setDataPressur();
 void getTimeOfClock();
 void saveAllData();
+void setDataMagn();
 
 void DataChoose();
 /*******************************

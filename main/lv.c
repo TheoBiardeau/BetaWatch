@@ -106,6 +106,7 @@ static void guiTask()
     lv_obj_t *scr6 = lv_obj_create(NULL, NULL);
     lv_obj_t *scr7 = lv_obj_create(NULL, NULL);
     lv_obj_t *scr8 = lv_obj_create(NULL, NULL);
+    lv_obj_t *scr9 = lv_obj_create(NULL, NULL);
 
     static lv_style_t style_Screen;
     lv_style_init(&style_Screen);
@@ -118,6 +119,7 @@ static void guiTask()
     lv_obj_add_style(scr6, LV_OBJ_PART_MAIN, &style_Screen);
     lv_obj_add_style(scr7, LV_OBJ_PART_MAIN, &style_Screen);
     lv_obj_add_style(scr8, LV_OBJ_PART_MAIN, &style_Screen);
+    lv_obj_add_style(scr9, LV_OBJ_PART_MAIN, &style_Screen);
 
     /**********************************
      *  set object for screen 1 *
@@ -166,9 +168,9 @@ static void guiTask()
     lv_label_set_text(L_legend_Bwz, "wz");
     lv_label_set_text(L_legend_chart_BG, "Gyroscope en temps reel");
 
-    lv_label_set_text(L_legend_Bwx_u, "-720                                     720");
-    lv_label_set_text(L_legend_Bwy_u, "-720                                     720");
-    lv_label_set_text(L_legend_Bwz_u, "-720                                     720");
+    lv_label_set_text(L_legend_Bwx_u, "-720                                720");
+    lv_label_set_text(L_legend_Bwy_u, "-720                                720");
+    lv_label_set_text(L_legend_Bwz_u, "-720                                720");
 
     /**********************************
      *  set object for screen 2 *
@@ -272,7 +274,7 @@ static void guiTask()
     lv_label_set_text(L_legend_Bax, "ax");
     lv_label_set_text(L_legend_Bay, "ay");
     lv_label_set_text(L_legend_Baz, "az");
-    lv_label_set_text(L_legend_chart_BA, "Accelerometer en temps reel");
+    lv_label_set_text(L_legend_chart_BA, "Accelerometre en temps reel");
 
     lv_label_set_text(L_legend_Bax_u, "-2                                       2");
     lv_label_set_text(L_legend_Bay_u, "-2                                       2");
@@ -330,26 +332,59 @@ static void guiTask()
     lv_label_set_text_fmt(L_legend_chart_A, "Ax           Ay          Az");
     lv_label_set_text_fmt(L_legend_Ax, "T+3s              T+2s              T+1s                T");
     lv_label_set_text_fmt(L_legend_Ay, "\n\n 2g\n\n 1g\n\n 0g\n\n-1g\n\n-2g");
-    lv_label_set_text_fmt(Title_screen_acc, "Accelerometer");
+    lv_label_set_text_fmt(Title_screen_acc, "Accelerometre");
 
     /**********************************
      *  set object for screen 5 *
      **********************************/
 
-    lv_obj_t *compas = lv_gauge_create(scr5, NULL);
-    lv_obj_t *legend_compas = lv_obj_create(scr5, NULL);
-    lv_obj_t *L_legend_compas = lv_label_create(scr5, NULL);
-    lv_obj_set_size(compas, 200, 200);
-    lv_obj_align(compas, NULL, LV_ALIGN_CENTER, 0, 0);
-    lv_gauge_set_range(compas, 0, 360);
-    lv_gauge_set_critical_value(compas, 361);
-    lv_gauge_set_scale(compas, 360, 25, 5);
+    lv_obj_t *b_mx = lv_bar_create(scr5, NULL);
+    lv_obj_t *b_my = lv_bar_create(scr5, NULL);
+    lv_obj_t *b_mz = lv_bar_create(scr5, NULL);
+    lv_obj_t *L_legend_Bmx = lv_label_create(scr5, NULL);
+    lv_obj_t *L_legend_Bmy = lv_label_create(scr5, NULL);
+    lv_obj_t *L_legend_Bmz = lv_label_create(scr5, NULL);
+    lv_obj_t *L_legend_chart_Bm = lv_label_create(scr5, NULL);
+    lv_obj_t *L_legend_Bmx_u = lv_label_create(b_mx, NULL);
+    lv_obj_t *L_legend_Bmy_u = lv_label_create(b_my, NULL);
+    lv_obj_t *L_legend_Bmz_u = lv_label_create(b_mz, NULL);
+    lv_obj_t *Value_mx = lv_label_create(b_mx, NULL);
+    lv_obj_t *Value_my = lv_label_create(b_my, NULL);
+    lv_obj_t *Value_mz = lv_label_create(b_mz, NULL);
 
-    lv_obj_set_size(legend_compas, 50, 30);
-    lv_obj_set_pos(legend_compas, 30, 250);
-    lv_obj_align(L_legend_compas, NULL, LV_ALIGN_IN_TOP_MID, -22, 0);
-    lv_label_set_text_fmt(L_legend_compas, "Compas");
+    lv_bar_set_range(b_mx, -680, 680);
+    lv_bar_set_range(b_my, -680, 680);
+    lv_bar_set_range(b_mz, -680, 680);
 
+    lv_obj_set_size(b_mx, 200, 20);
+    lv_obj_set_size(b_my, 200, 20);
+    lv_obj_set_size(b_mz, 200, 20);
+
+    lv_obj_align(b_mx, NULL, LV_ALIGN_CENTER, 0, -60);
+    lv_obj_align(b_my, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align(b_mz, NULL, LV_ALIGN_CENTER, 0, 60);
+
+    lv_obj_align(L_legend_Bmx, NULL, LV_ALIGN_CENTER, 10, -40);
+    lv_obj_align(L_legend_Bmy, NULL, LV_ALIGN_CENTER, 10, 20);
+    lv_obj_align(L_legend_Bmz, NULL, LV_ALIGN_CENTER, 10, 80);
+    lv_obj_align(L_legend_chart_Bm, NULL, LV_ALIGN_IN_TOP_MID, -83, 0);
+
+    lv_obj_align(L_legend_Bmx_u, NULL, LV_ALIGN_IN_LEFT_MID, 5, 0);
+    lv_obj_align(L_legend_Bmy_u, NULL, LV_ALIGN_IN_LEFT_MID, 5, 0);
+    lv_obj_align(L_legend_Bmz_u, NULL, LV_ALIGN_IN_LEFT_MID, 5, 0);
+
+    lv_obj_align(Value_mx, NULL, LV_ALIGN_CENTER, 3, 0);
+    lv_obj_align(Value_my, NULL, LV_ALIGN_CENTER, 3, 0);
+    lv_obj_align(Value_mz, NULL, LV_ALIGN_CENTER, 3, 0);
+
+    lv_label_set_text(L_legend_Bmx, "mx");
+    lv_label_set_text(L_legend_Bmy, "my");
+    lv_label_set_text(L_legend_Bmz, "mz");
+    lv_label_set_text(L_legend_chart_Bm, "Magnetometre en temps reel");
+
+    lv_label_set_text(L_legend_Bmx_u, "-685                                685");
+    lv_label_set_text(L_legend_Bmy_u, "-685                                685");
+    lv_label_set_text(L_legend_Bmz_u, "-685                                685");
     /**********************************
      *  set object for screen 6 *
      **********************************/
@@ -373,13 +408,13 @@ static void guiTask()
     lv_gauge_set_scale(humidity, 290, 50, 5);
 
     lv_obj_align(legend_temp_humi, NULL, LV_ALIGN_IN_TOP_LEFT, 35, 0);
-    lv_label_set_text_fmt(legend_temp_humi, "Tempererature et humidite");
+    lv_label_set_text_fmt(legend_temp_humi, "Temperature et humidite");
 
     lv_obj_align(L_templ, NULL, LV_ALIGN_CENTER, -140, 90);
-    lv_label_set_text_fmt(L_templ, "Tempererature (°c)");
+    lv_label_set_text_fmt(L_templ, "Temperature (°c)");
 
     lv_obj_align(L_humil, NULL, LV_ALIGN_CENTER, 45, 90);
-    lv_label_set_text_fmt(L_humil, "humidite (/100)");
+    lv_label_set_text_fmt(L_humil, "Humidite (/%%)");
 
     /**********************************
      *  set object for screen 7 *
@@ -394,7 +429,7 @@ static void guiTask()
     lv_gauge_set_scale(pressure_gauge, 270, 25, 5);
 
     lv_obj_align(L_legend_pressure, NULL, LV_ALIGN_IN_TOP_MID, -22, 0);
-    lv_label_set_text_fmt(L_legend_pressure, "pressure");
+    lv_label_set_text_fmt(L_legend_pressure, "Pression");
 
     /**********************************
      *  set object for screen 8 *
@@ -405,7 +440,28 @@ static void guiTask()
     lv_obj_t *Time = lv_label_create(scr8, NULL);
     lv_obj_set_size(Time, 50, 30);
     lv_obj_set_pos(Time, 30, 250);
-    lv_obj_align(Time, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0);
+    lv_obj_align(Time, NULL, LV_ALIGN_IN_LEFT_MID, 30, 0);
+
+    /**********************************
+     *  set object for screen 8 *
+     *********************************/
+
+    lv_obj_t *step_bar = lv_bar_create(scr9, NULL);
+    lv_obj_t *Legend_screen = lv_label_create(scr9, NULL);
+    lv_obj_t *Value_steps = lv_label_create(step_bar, NULL);
+
+    lv_bar_set_range(step_bar, 0, 1000);
+
+    lv_obj_set_size(step_bar, 200, 20);
+
+    lv_obj_align(step_bar, NULL, LV_ALIGN_CENTER, 0, -60);
+
+    lv_obj_align(Legend_screen, NULL, LV_ALIGN_IN_TOP_MID, -63, 0);
+
+    lv_obj_align(Value_steps, NULL, LV_ALIGN_CENTER, 3, 0);
+
+    lv_label_set_text(Legend_screen, "Compteur de pas");
+
     while (1)
     {
         lv_task_handler();
@@ -455,8 +511,13 @@ static void guiTask()
         else if (chooseScreen == 4)
         {
             lv_scr_load(scr5);
-            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
-            lv_gauge_set_value(compas, 0, 0);
+            xQueueReceive(dataMagn_Queue_Screen, &DMA_Buff, portMAX_DELAY);
+            lv_bar_set_value(b_mx, DMA_Buff.Dmagn_x, NULL);
+            lv_bar_set_value(b_my, DMA_Buff.Dmagn_y, NULL);
+            lv_bar_set_value(b_mz, DMA_Buff.Dmagn_z, NULL);
+            lv_label_set_text_fmt(Value_mx, "%.2f", DMA_Buff.Dmagn_x);
+            lv_label_set_text_fmt(Value_my, "%.2f", DMA_Buff.Dmagn_y);
+            lv_label_set_text_fmt(Value_mz, "%.2f", DMA_Buff.Dmagn_z);
         }
         else if (chooseScreen == 5)
         {
@@ -480,12 +541,19 @@ static void guiTask()
             time_t now;
             time(&now);
             // Set timezone to China Standard Time
-            setenv("TZ", "CST-0", 1);
+            setenv("TZ", "CST-2", 1);
             tzset();
             localtime_r(&now, &timeinfo);
             strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
             printf("%s\n", strftime_buf);
             lv_label_set_text_fmt(Time, "%s", strftime_buf);
+        }
+        else if (chooseScreen == 8)
+        {
+            lv_scr_load(scr9);
+            xQueueReceive(dataMouvement_Queue_Screen, &DM_Buff, portMAX_DELAY);
+            lv_bar_set_value(step_bar, DM_Buff.steps, NULL);
+            lv_label_set_text_fmt(Value_steps, "%d", DM_Buff.steps);
         }
     }
 }

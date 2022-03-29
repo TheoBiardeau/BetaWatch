@@ -18,6 +18,8 @@ void IRAM_ATTR GPIO_iterupt(void *arg)
         xQueueSendFromISR(dataMouvement_Queue_Screen, &DM, pdFALSE);
         xQueueSendFromISR(dataTempHumi_Queue_Screen, &DTH, pdFALSE);
         xQueueSendFromISR(dataPressur_Queue_Screen, &DTH, pdFALSE);
+        xQueueSendFromISR(dataTime_Queue_Screen,&tm_on_task, pdFALSE);
+        xQueueSendFromISR(dataMagn_Queue_Screen, &DMA, pdFALSE);
     }
 }
 
