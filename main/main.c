@@ -17,13 +17,9 @@ void app_main(void)
     clockSychronize();
     initQueuesSensors();
     initGPIO();
-    // Ble_launch();
     launchLVGL(1);
+    //Ble_launch();
     uint32_t test = 0;
 
-    
-    while (1)
-    {
-        vTaskDelay(10);
-    }
+
 }

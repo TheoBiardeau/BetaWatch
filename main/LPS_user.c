@@ -93,9 +93,8 @@ esp_err_t i2c_master_init()
 T_dataPressur getPressure()
 {
     int ret;
-    int loop = 0;
 
-    while (initloop)
+    if (initloop == 1)
     {
 
         /* This acts as the entry point of ST's STTS751 driver */
@@ -109,21 +108,16 @@ T_dataPressur getPressure()
         initloop = 0;
     }
 
-    if(initloop == 0) { // si le capteur est initialisé
-        loop = 1;
-    }
-
-    while (loop)
+    if (initloop == 0)
     {
 
-        /* whoami tesk is run only once. At the end, we start get_pressure_task */
-        /* Read output only if new value is available */
         lps22hh_read_reg(&dev_ctx, LPS22HH_STATUS, (uint8_t *)&reg_LPS22HH, 1);
+        memset(&data_raw_pressure, 0x00, sizeof(uint32_t));           // Allocation d'une zone mémoire
+        lps22hh_pressure_raw_get(&dev_ctx, &data_raw_pressure);       // Acquisition de la pression
+        DPLPS.Dpressure = lps22hh_from_lsb_to_hpa(data_raw_pressure); // Conversion de la données brute en hPa                          // Valeur retournée : pression en hPa
+        /* whoami tesk is run only once. At the end, we start get_pressure_task */
 
-        memset(&data_raw_pressure, 0x00, sizeof(uint32_t));
-        lps22hh_pressure_raw_get(&dev_ctx, &data_raw_pressure);
-        DPLPS.Dpressure = lps22hh_from_lsb_to_hpa(data_raw_pressure);
-        loop = 0;
-        }
+        //printf("%f\n", DPLPS.Dpressure);
+    }
     return (DPLPS);
 }

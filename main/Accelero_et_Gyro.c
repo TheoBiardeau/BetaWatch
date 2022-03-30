@@ -202,7 +202,5 @@ T_dataMouvement get_LSM6DSO()
     // Lit le nombre de pas
     lsm6dso_number_of_steps_get(&lsm6dsoDriver, &raw_steps);
     DMT.steps = raw_steps;
-    printf("nombre de pas %d\n", raw_steps);
-
     return DMT;
 }

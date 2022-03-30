@@ -53,7 +53,6 @@ void setDataMouv_Task()
         if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
         {
             DM = get_LSM6DSO();
-            printf("%f \n", DMA.Dmagn_x);
 
             if (xQueueSend(dataMouvement_Queue_Sd, (void *)&DM, NULL) != pdPASS)
             {
@@ -141,7 +140,7 @@ void setDataPressure_Task()
             }
             xSemaphoreGive(I2CSema);
         }
-        vTaskDelay(1000);
+        vTaskDelay(100);
     }
 }
 
