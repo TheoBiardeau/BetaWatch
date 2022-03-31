@@ -33,7 +33,6 @@ void initQueuesSensors()
     xTaskCreatePinnedToCore(setDataMouv_Task, "setDataMouv_Task", 10000, NULL, 4, NULL, 1);
     xTaskCreatePinnedToCore(setDataTempHumi_Task, "setDataTempHumi_Task", 10000, NULL, 4, NULL, 1);
     xTaskCreatePinnedToCore(getTimeOfClock_Task, "getTimeOfClock_Task", 10000, NULL, 4, NULL, 1);
-    xTaskCreatePinnedToCore(setDataMagn_Task, "setDataMagn_Task", 10000, NULL, 4, NULL, 1);
 
     printf("init data ok \n");
 }
@@ -53,7 +52,7 @@ void setDataMouv_Task()
         if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
         {
             DM = get_LSM6DSO();
-
+            DMA = magnetometerCapture();
             if (xQueueSend(dataMouvement_Queue_Sd, (void *)&DM, NULL) != pdPASS)
             {
                 /* Failed to post the message, even after 10 ticks. */
@@ -77,20 +76,7 @@ void setDataMouv_Task()
     }
 }
 
-void setDataMagn_Task()
-{
-    while (1)
 
-    {
-        if (xSemaphoreTake(I2CSema, (TickType_t)portMAX_DELAY))
-        {
-            DMA = magnetometerCapture();
-
-            xSemaphoreGive(I2CSema);
-        }
-        vTaskDelay(10);
-    }
-}
 
 void setDataTempHumi_Task()
 {
@@ -115,7 +101,7 @@ void setDataTempHumi_Task()
             }
             xSemaphoreGive(I2CSema);
         }
-        vTaskDelay(10000);
+        vTaskDelay(1000);
     }
 }
 
@@ -164,6 +150,6 @@ void getTimeOfClock_Task()
             }
             xSemaphoreGive(I2CSema);
         }
-        vTaskDelay(1000);
+        vTaskDelay(100);
     }
 }
