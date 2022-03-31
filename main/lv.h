@@ -56,7 +56,7 @@ static T_dataPressur DP_Buff;
 static T_dataTempHumi DTH_Buff;
 static T_dataMagnetique DMA_Buff;
 
-static struct tm timeinfo;
+struct tm timeinfo;
 time_t now;
 
 #endif

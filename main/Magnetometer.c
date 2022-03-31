@@ -49,7 +49,11 @@ bool magnetometerInit()
         lis2mdl_offset_temp_comp_set(&Driver_Magnetometer, PROPERTY_ENABLE);
         /* Set device in continuous mode */
         lis2mdl_operating_mode_set(&Driver_Magnetometer, LIS2MDL_CONTINUOUS_MODE);
-
+        /* Set low power mode */
+        lis2mdl_power_mode_set(&Driver_Magnetometer, LIS2MDL_LOW_POWER);
+        /* Set a LP bandwidth */
+        lis2mdl_low_pass_bandwidth_set(&Driver_Magnetometer, LIS2MDL_ODR_DIV_4);
+        
         ESP_LOGI(TAG_MAGNETOMETER, "Sensor is properly init.");
 
         return true;

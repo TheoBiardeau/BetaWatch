@@ -538,14 +538,11 @@ static void guiTask()
             lv_scr_load(scr8);
             char strftime_buf[64];
             xQueueReceive(dataTime_Queue_Screen, &timeinfo, portMAX_DELAY);
-            time_t now;
-            time(&now);
-            // Set timezone to China Standard Time
+
+            // Set timezone to France Standard Time and stringify time
             setenv("TZ", "CST-2", 1);
             tzset();
-            localtime_r(&now, &timeinfo);
             strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-            printf("%s\n", strftime_buf);
             lv_label_set_text_fmt(Time, "%s", strftime_buf);
         }
         else if (chooseScreen == 8)
