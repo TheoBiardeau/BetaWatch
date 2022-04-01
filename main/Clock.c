@@ -114,12 +114,16 @@ void clockSychronize() {
     time(&now);
     // Fit current time in a struc tm type
     localtime_r(&now, &timeinfo);
+
+    // Display time from STNP server
+    printf("The current date/time received via SNTP is : %s\r\n", asctime(&timeinfo));
+    
     // Set current time into the targeted RTC
     int ret = rv3029c2_time_set(&rv3029Driver, &timeinfo);
 
     if (ret == ESP_OK) {
         ESP_LOGI(TAG_CLOCK, "Device is properly synchronized.");
-        displayTime(); //DEBUG : uncomment the line to debug the sensor
+        //displayTime(); //DEBUG : uncomment the line to debug the sensor
     } else {
         ESP_LOGE(TAG_CLOCK, "Divice cannot be synchronized.");
     }
@@ -132,6 +136,7 @@ struct tm clockGetTime() {
     // Grab current time from the RTC
     rv3029c2_time_get(&rv3029Driver, &tm_now);
     //displayTime(); //DEBUG : uncomment the line to debug the sensor
+
     return tm_now;
 }
 
@@ -144,7 +149,7 @@ static void displayTime(){
     rv3029c2_time_get(&rv3029Driver, &timeinfo);
 
     // Set timezone to France Standard Time and stringify time
-    setenv("TZ", "CST-2", 1);
+    setenv("TZ", "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00", 1);
     tzset();
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
     
